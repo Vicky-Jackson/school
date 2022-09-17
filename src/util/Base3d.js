@@ -52,7 +52,9 @@ class Base3d {
     initScene() {
         this.scene = new THREE.Scene();
         // this.scene.setEnvMap('000');
-        //this.scene.background = new THREE.Color("black")
+        this.scene.background = new THREE.Color("#D2B48C")
+        
+        
     }
     initCamera() {
         this.camera = new THREE.PerspectiveCamera(
@@ -86,15 +88,40 @@ class Base3d {
          this.controls = new OrbitControls(this.camera, this.renderer.domElement);
      }
      addMesh(){
-        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const cubeMateria = new THREE.MeshBasicMaterial({
-            color: 0xffff00
+        //添加平面
+        const planeGeometry = new THREE.PlaneGeometry(100,100);
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            color:0xffffff,
         });
-        const cube = new THREE.Mesh(cubeGeometry, cubeMateria);
-        this.scene.add(cube);
+        const plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x = -Math.PI / 2;
+        this.scene.add(plane);
+       const loader = new GLTFLoader();
+       loader.load('/texture/scene.gltf', (gltf) => {
+           this.scene.add(gltf.scene);
+           this.camera = gltf.scene.cameras[0];
+           this.spotlight = gltf.scene.children[0];
+           this.spotlight.intensity = 1;
+       }, undefined, function (error) {
+           console.error(error);
+       });
+       this.scene.add(new THREE.AmbientLight(0x999999));
+       this.light = new THREE.DirectionalLight(0xdfebff, 0.45) // 从正上方（不是位置）照射过来的平行光，0.45的强度
+       this.light.position.set(100, 600, 400)
+       this.light.position.multiplyScalar(0.3)
+       this.light.shadow.camera.near = 20 // 产生阴影的最近距离
+       this.light.shadow.camera.far = 20000 // 产生阴影的最远距离
+       this.light.shadow.camera.left = -500 // 产生阴影距离位置的最左边位置
+       this.light.shadow.camera.right = 500 // 最右边
+       this.light.shadow.camera.top = 500 // 最上边
+       this.light.shadow.camera.bottom = -500 // 最下面
 
-        const axesHelper = new THREE.AxesHelper(5);
-        this.scene.add(axesHelper);
+       // 光源开启阴影
+       this.light.castShadow = true
+       this.light.shadow.mapSize = new THREE.Vector2(1024, 1024)
+       var helper = new THREE.DirectionalLightHelper(this.light, 5)
+       this.scene.add(helper)
+       this.scene.add(this.light)
      }
      onWindowResize() {
          this.camera.aspect = window.innerWidth / window.innerHeight;

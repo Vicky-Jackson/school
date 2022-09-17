@@ -1,0 +1,11 @@
+Model Information:
+* title:	Soviet Residential Building
+* source:	https://sketchfab.com/3d-models/soviet-residential-building-0b5896a218e64b27b9808faa91f91627
+* author:	Ivan-Kanaev (https://sketchfab.com/Ivan-Kanaev)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Soviet Residential Building" (https://sketchfab.com/3d-models/soviet-residential-building-0b5896a218e64b27b9808faa91f91627) by Ivan-Kanaev (https://sketchfab.com/Ivan-Kanaev) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
