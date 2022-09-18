@@ -16,6 +16,7 @@ class Base3d {
         this.container = document.querySelector(selector);
         this.camera;
         this.scene;
+        this.controls;
         this.renderer;
         this.model;
         this.panzi;
@@ -47,7 +48,7 @@ class Base3d {
         window.addEventListener("resize", this.onWindowResize.bind(this));
 
         // 监听滚轮事件
-        window.addEventListener("mousewheel", this.onMouseWheel.bind(this));
+        //window.addEventListener("mousewheel", this.onMouseWheel.bind(this));
     }
     initScene() {
         this.scene = new THREE.Scene();
@@ -60,10 +61,11 @@ class Base3d {
         this.camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
-            0.25,
-            200
+            0.1,
+            1000
         );
-        this.camera.position.set(-1.8,0.6,2.7)
+        this.camera.position.set(-1.8,0.6,2.7);
+        
     }
     initRenderer() {
         this.renderer = new THREE.WebGLRenderer({antialias:true});
@@ -79,6 +81,7 @@ class Base3d {
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
+        this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
      animate() {
@@ -86,42 +89,18 @@ class Base3d {
      }
      initControls() {
          this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+         this.controls.enableDamping = true;
      }
      addMesh(){
-        //添加平面
-        const planeGeometry = new THREE.PlaneGeometry(100,100);
-        const planeMaterial = new THREE.MeshBasicMaterial({
-            color:0xffffff,
-        });
-        const plane = new THREE.Mesh(planeGeometry,planeMaterial);
-        plane.rotation.x = -Math.PI / 2;
-        this.scene.add(plane);
        const loader = new GLTFLoader();
        loader.load('/texture/scene.gltf', (gltf) => {
+            //gltf.scene.position.set(-80,-50,-80)
            this.scene.add(gltf.scene);
-           this.camera = gltf.scene.cameras[0];
-           this.spotlight = gltf.scene.children[0];
-           this.spotlight.intensity = 1;
+            console.log(gltf);
        }, undefined, function (error) {
            console.error(error);
        });
        this.scene.add(new THREE.AmbientLight(0x999999));
-       this.light = new THREE.DirectionalLight(0xdfebff, 0.45) // 从正上方（不是位置）照射过来的平行光，0.45的强度
-       this.light.position.set(100, 600, 400)
-       this.light.position.multiplyScalar(0.3)
-       this.light.shadow.camera.near = 20 // 产生阴影的最近距离
-       this.light.shadow.camera.far = 20000 // 产生阴影的最远距离
-       this.light.shadow.camera.left = -500 // 产生阴影距离位置的最左边位置
-       this.light.shadow.camera.right = 500 // 最右边
-       this.light.shadow.camera.top = 500 // 最上边
-       this.light.shadow.camera.bottom = -500 // 最下面
-
-       // 光源开启阴影
-       this.light.castShadow = true
-       this.light.shadow.mapSize = new THREE.Vector2(1024, 1024)
-       var helper = new THREE.DirectionalLightHelper(this.light, 5)
-       this.scene.add(helper)
-       this.scene.add(this.light)
      }
      onWindowResize() {
          this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -129,19 +108,19 @@ class Base3d {
          this.renderer.setSize(window.innerWidth, window.innerHeight);
          // this.render();
      }
-     onMouseWheel(e) {
-         // console.log(this.animateAction);
-         let timeScale = e.deltaY > 0 ? 1 : -1;
-         this.animateAction.setEffectiveTimeScale(timeScale);
-         this.animateAction.paused = false;
-         this.animateAction.play();
-         if (this.timeoutid) {
-             clearTimeout(this.timeoutid);
-         }
-         this.timeoutid = setTimeout(() => {
-             this.animateAction.halt(0.5);
-         }, 300);
-     }
+    //  onMouseWheel(e) {
+    //       console.log(this.animateAction);
+    //      let timeScale = e.deltaY > 0 ? 1 : -1;
+    //      this.animateAction.setEffectiveTimeScale(timeScale);
+    //      this.animateAction.paused = false;
+    //      this.animateAction.play();
+    //      if (this.timeoutid) {
+    //          clearTimeout(this.timeoutid);
+    //      }
+    //      this.timeoutid = setTimeout(() => {
+    //          this.animateAction.halt(0.5);
+    //      }, 300);
+    //  }
 }
 
 export default Base3d;
