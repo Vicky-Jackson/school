@@ -48,7 +48,7 @@ class Base3d {
         window.addEventListener("resize", this.onWindowResize.bind(this));
 
         // 监听滚轮事件
-        //window.addEventListener("mousewheel", this.onMouseWheel.bind(this));
+        window.addEventListener("mousewheel", this.onMouseWheel.bind(this));
     }
     initScene() {
         this.scene = new THREE.Scene();
@@ -81,7 +81,6 @@ class Base3d {
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
-        this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
      animate() {
@@ -90,17 +89,25 @@ class Base3d {
      initControls() {
          this.controls = new OrbitControls(this.camera, this.renderer.domElement);
          this.controls.enableDamping = true;
-     }
+    }
      addMesh(){
-       const loader = new GLTFLoader();
-       loader.load('/texture/scene.gltf', (gltf) => {
-            //gltf.scene.position.set(-80,-50,-80)
-           this.scene.add(gltf.scene);
-            console.log(gltf);
-       }, undefined, function (error) {
-           console.error(error);
-       });
-       this.scene.add(new THREE.AmbientLight(0x999999));
+        return new Promise((resolve, reject) =>{
+            const loader = new GLTFLoader();
+            loader.load('/texture/scene.gltf', (gltf) => {
+                var box = new THREE.Box3().setFromObject(gltf.scene);
+                box.getCenter(gltf.scene.position);
+                gltf.scene.position.multiplyScalar(-1);
+
+                var pivot = new THREE.Group();
+                this.scene.add(pivot);
+                pivot.add(gltf.scene);
+                
+            }, undefined, function (error) {
+                console.error(error);
+            });
+            this.scene.add(new THREE.AmbientLight(0x999999));
+         })
+
      }
      onWindowResize() {
          this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -108,19 +115,30 @@ class Base3d {
          this.renderer.setSize(window.innerWidth, window.innerHeight);
          // this.render();
      }
-    //  onMouseWheel(e) {
-    //       console.log(this.animateAction);
-    //      let timeScale = e.deltaY > 0 ? 1 : -1;
-    //      this.animateAction.setEffectiveTimeScale(timeScale);
-    //      this.animateAction.paused = false;
-    //      this.animateAction.play();
-    //      if (this.timeoutid) {
-    //          clearTimeout(this.timeoutid);
-    //      }
-    //      this.timeoutid = setTimeout(() => {
-    //          this.animateAction.halt(0.5);
-    //      }, 300);
-    //  }
+     onMouseWheel(e) {
+          var fov = this.camera.fov;
+          var near = this.camera.near;
+          var far = this.camera.far;
+          e.preventDefault();
+          //e.stopPropagation();
+          if (e.wheelDelta) { //判断浏览器IE，谷歌滑轮事件
+              if (e.wheelDelta > 0) { //当滑轮向上滚动时
+                  fov -= (near < fov ? 1 : 0);
+              }
+              if (e.wheelDelta < 0) { //当滑轮向下滚动时
+                  fov += (fov < far ? 1 : 0);
+              }
+          } else if (e.detail) { //Firefox滑轮事件
+              if (e.detail > 0) { //当滑轮向上滚动时
+                  fov -= 1;
+              }
+              if (e.detail < 0) { //当滑轮向下滚动时
+                  fov += 1;
+              }
+          }
+          this.camera.fov = fov;
+          this.camera.updateProjectionMatrix();
+     }
 }
 
 export default Base3d;
