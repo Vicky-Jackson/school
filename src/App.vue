@@ -1,18 +1,11 @@
 <template>
-  <div id="app">
-    
-  </div>
+  <router-view></router-view>
 </template>
 
 <script setup>
-import Base3d from "./util/Base3d.js";
-import { reactive, onMounted } from "vue";
-const data = reactive({
-  base3d: {},
-});
 
-onMounted(() => {
-  data.base3d = new Base3d("#app");
-});
 </script>
 
+<style lang="less" scoped>
+
+</style>

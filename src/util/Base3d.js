@@ -15,11 +15,12 @@ class Base3d {
     constructor(selector, onFinish) {
         this.container = document.querySelector(selector);
         this.camera;
+        this.group;
         this.scene;
         this.controls;
         this.renderer;
         this.model;
-        this.panzi;
+        this.selectObject;
         this.animateAction;
         this.clock = new THREE.Clock();
         this.onFinish = onFinish;
@@ -44,18 +45,24 @@ class Base3d {
         // 添加物体
         this.addMesh();
 
+        this.initGroup();
+
         // 监听场景大小改变，调整渲染尺寸
         window.addEventListener("resize", this.onWindowResize.bind(this));
 
         // 监听滚轮事件
-        window.addEventListener("mousewheel", this.onMouseWheel.bind(this));
+        window.addEventListener("mousewheel", this.onMouseWheel.bind(this), {
+            passive: false
+        });
+
+        //监听鼠标点击事件
+        window.addEventListener("click",this.onMouseClick.bind(this))
     }
     initScene() {
         this.scene = new THREE.Scene();
         // this.scene.setEnvMap('000');
-        this.scene.background = new THREE.Color("#D2B48C")
-        
-        
+        this.scene.background = new THREE.Color("#D2B48C");
+        this.scene.add(new THREE.AmbientLight(0x999999));
     }
     initCamera() {
         this.camera = new THREE.PerspectiveCamera(
@@ -78,6 +85,9 @@ class Base3d {
         this.renderer.toneMappingExposure = 3;
         this.container.appendChild(this.renderer.domElement);
     }
+    initGroup(){
+        this.group = new THREE.Group();
+    }
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
@@ -90,24 +100,63 @@ class Base3d {
          this.controls = new OrbitControls(this.camera, this.renderer.domElement);
          this.controls.enableDamping = true;
     }
+    initBuilding(){
+         const loader = new GLTFLoader();
+         loader.load('/texture/building/scene.gltf', (gltf) => {
+             var box = new THREE.Box3().setFromObject(gltf.scene);
+             let model = gltf.scene;
+             box.getCenter(gltf.scene.position);
+             gltf.scene.position.multiplyScalar(-1);
+             //this.group = new THREE.Group();
+             this.scene.add(this.group);
+             this.group.add(gltf.scene);
+             console.log(this.group);
+             //console.log(gltf.scene);
+
+         }, undefined, function (error) {
+             console.error(error);
+         });
+    }
+    initRobot() {
+        const loader = new GLTFLoader();
+        loader.load('/texture/RobotExpressive/RobotExpressive.glb', (gltf) => {
+            gltf.scene.position.y = -19;
+            gltf.scene.scale.set(2,2,2)
+            this.scene.add(this.group);
+            this.group.add(gltf.scene);
+            console.log(this.group);
+            //console.log(gltf.scene);
+            
+        }, undefined, function (error) {
+            console.error(error);
+        });
+    }
      addMesh(){
-        return new Promise((resolve, reject) =>{
-            const loader = new GLTFLoader();
-            loader.load('/texture/scene.gltf', (gltf) => {
-                var box = new THREE.Box3().setFromObject(gltf.scene);
-                box.getCenter(gltf.scene.position);
-                gltf.scene.position.multiplyScalar(-1);
+           this.initBuilding();
+           this.initRobot();
+     }
+     getIntersects(event){
+        event.preventDefault(); // 阻止默认的点击事件执行
+        //console.log("event.clientX:" + event.clientX);
+        //console.log("event.clientY:" + event.clientY);
 
-                var pivot = new THREE.Group();
-                this.scene.add(pivot);
-                pivot.add(gltf.scene);
-                
-            }, undefined, function (error) {
-                console.error(error);
-            });
-            this.scene.add(new THREE.AmbientLight(0x999999));
-         })
+        //声明 rayCaster 和 mouse 变量
+        let rayCaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
 
+        //通过鼠标点击位置，计算出raycaster所需点的位置，以屏幕为中心点，范围-1到1
+        mouse.x = ((event.clientX - this.container.getBoundingClientRect().left) / this.container.offsetWidth) * 2 - 1;
+        mouse.y = -((event.clientY - this.container.getBoundingClientRect().top) / this.container.offsetHeight) * 2 + 1; //这里为什么是-号，没有就无法点中
+
+        //通过鼠标点击的位置(二维坐标)和当前相机的矩阵计算出射线位置
+        rayCaster.setFromCamera(mouse, this.camera);
+
+        //获取与射线相交的对象数组， 其中的元素按照距离排序，越近的越靠前。
+        //+true，是对其后代进行查找，这个在这里必须加，因为模型是由很多部分组成的，后代非常多。
+        let intersects = rayCaster.intersectObjects(this.group.children, true);
+
+        //返回选中的对象
+        return intersects;
      }
      onWindowResize() {
          this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -138,6 +187,22 @@ class Base3d {
           }
           this.camera.fov = fov;
           this.camera.updateProjectionMatrix();
+     }
+
+     onMouseClick(e){
+        //获取raycaster和所有模型相交的数组，其中的元素按照距离排序，越近的越靠前
+        let intersects = this.getIntersects(e);
+          console.log(intersects);
+        //  console.log(intersects[0].object);
+
+        //获取选中最近的Mesh对象
+        //instance坐标是对象，右边是类，判断对象是不是属于这个类的
+        if (intersects.length !== 0 && intersects[0].object.type == 'Mesh') {
+            this.selectObject = intersects[0].object;
+            //changeMaterial(selectObject)
+        } else {
+            console.log('未选中 Mesh!');
+        }
      }
 }
 
