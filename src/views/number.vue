@@ -1,21 +1,22 @@
 <template>
     <div>
-        <div id="number" class="number">
-        </div>
+        <div id="number" class="number"></div>
         <div id="tooltip" class="number"></div>
     </div>
 </template>
 
-<script setup>
-import Base3d from "../util/China3d.js";
-import { reactive, onMounted } from "vue";
-const data = reactive({
-    base3d: {},
-});
-
-onMounted(() => {
-    data.base3d = new Base3d(".number");
-});
+<script>
+import China3d from "../util/China3d.js";
+export default {
+    data() {
+        return {
+            china3d: {}
+        }
+    },
+    mounted() {
+        this.china3d = new China3d('#number');
+    }
+}
 </script>
 
 <style lang="less" scoped>

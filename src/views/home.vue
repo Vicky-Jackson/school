@@ -4,16 +4,18 @@
     </div>
 </template>
 
-<script setup>
+<script>
 import Base3d from "../util/Base3d.js";
-import { reactive, onMounted } from "vue";
-const data = reactive({
-    base3d: {},
-});
-
-onMounted(() => {
-    data.base3d = new Base3d("#home");
-});
+export default{
+    data() {
+        return {
+            base3d:{}
+        }
+    },
+    mounted(){
+        this.base3d = new Base3d('#home');
+    }
+}
 </script>
 
 <style lang="less" scoped>
