@@ -1,6 +1,6 @@
 <template>
     <div id="home">
-
+        <router-link to="/number">新生数据</router-link>
     </div>
 </template>
 

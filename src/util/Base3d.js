@@ -56,7 +56,7 @@ class Base3d {
         });
 
         //监听鼠标点击事件
-        window.addEventListener("click", this.onMouseClick.bind(this))
+        //window.addEventListener("click", this.onMouseClick.bind(this))
     }
     initScene() {
         this.scene = new THREE.Scene();
@@ -142,8 +142,8 @@ class Base3d {
             
             //console.log(gltf.scene);
             var mesh = this.initSprite();
-            mesh.position.set(80, 25, -300);
-            console.log(mesh)
+            mesh.position.set(80, 25, -320);
+            //console.log(mesh)
             model.add(mesh);
             this.scene.add(this.group);
             this.group.add(gltf.scene);
@@ -156,10 +156,11 @@ class Base3d {
         const loader = new GLTFLoader();
         loader.load('/texture/RobotExpressive/RobotExpressive.glb', (gltf) => {
             gltf.scene.position.y = -19;
-            gltf.scene.scale.set(2, 2, 2)
+            gltf.scene.scale.set(2, 2, 2);
+            console.log(gltf.animations);
             this.scene.add(this.group);
             this.group.add(gltf.scene);
-            console.log(this.group);
+            //console.log(this.group);
             //console.log(gltf.scene);
 
         }, undefined, function (error) {
@@ -170,29 +171,7 @@ class Base3d {
         this.initBuilding();
         this.initRobot();
     }
-    getIntersects(event) {
-        event.preventDefault(); // 阻止默认的点击事件执行
-        //console.log("event.clientX:" + event.clientX);
-        //console.log("event.clientY:" + event.clientY);
-
-        //声明 rayCaster 和 mouse 变量
-        let rayCaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
-
-        //通过鼠标点击位置，计算出raycaster所需点的位置，以屏幕为中心点，范围-1到1
-        mouse.x = ((event.clientX - this.container.getBoundingClientRect().left) / this.container.offsetWidth) * 2 - 1;
-        mouse.y = -((event.clientY - this.container.getBoundingClientRect().top) / this.container.offsetHeight) * 2 + 1; //这里为什么是-号，没有就无法点中
-
-        //通过鼠标点击的位置(二维坐标)和当前相机的矩阵计算出射线位置
-        rayCaster.setFromCamera(mouse, this.camera);
-
-        //获取与射线相交的对象数组， 其中的元素按照距离排序，越近的越靠前。
-        //+true，是对其后代进行查找，这个在这里必须加，因为模型是由很多部分组成的，后代非常多。
-        let intersects = rayCaster.intersectObjects(this.group.children, true);
-
-        //返回选中的对象
-        return intersects;
-    }
+    
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
@@ -224,23 +203,7 @@ class Base3d {
         this.camera.updateProjectionMatrix();
     }
 
-    onMouseClick(e) {
-        //获取raycaster和所有模型相交的数组，其中的元素按照距离排序，越近的越靠前
-        let intersects = this.getIntersects(e);
-        //console.log(intersects[0].point);
-        //获取选中最近的Mesh对象
-        //instance坐标是对象，右边是类，判断对象是不是属于这个类的
-        if (intersects.length !== 0 && intersects[0].object.type == 'Mesh') {
-            var selectObject = intersects[0].point;
-            console.log(selectObject);
-            this.changeMaterial(selectObject)
-        } else {
-            console.log('未选中 Mesh!');
-        }
-    }
-    changeMaterial(selectObject){
-
-    }
+    
 }
 
 export default Base3d;

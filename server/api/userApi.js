@@ -50,7 +50,7 @@ router.post('/getUser', (req, res) => {
     let params = req.body;
     console.log(params);
 
-    conn.query(sql, [params.name], (err, result) => {
+    conn.query(sql, [params.username,params.password], (err, result) => {
         if (err) {
             console.log(err);
         }
