@@ -5,18 +5,17 @@
     </div>
 </template>
 
-<script>
-import China3d from "../util/China3d.js";
-export default {
-    data() {
-        return {
-            china3d: {}
-        }
-    },
-    mounted() {
-        this.china3d = new China3d('#number');
-    }
-}
+<script setup>
+import Number3d from '../util/China3d'
+import {
+    reactive, onMounted
+} from 'vue'
+const data = reactive({
+    number3d: {},
+})
+onMounted(() => {
+    data.number3d = new Number3d('.number')
+})
 </script>
 
 <style lang="less" scoped>
