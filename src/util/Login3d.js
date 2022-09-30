@@ -35,8 +35,8 @@ class Login3d {
         this.animate();
         this.progressFn;
     }
-    onprogress(fn) {
-        fn.progressFn = progressFn;
+    onProgress(fn) {
+        this.progressFn = fn;
     }
     //初始化
     init() {
@@ -52,7 +52,7 @@ class Login3d {
         this.initControls();
         this.initDraco()
         // 添加物体
-        this.addMesh();
+        this.addProgress();
 
         this.initGroup();
 
@@ -150,76 +150,86 @@ class Login3d {
                     duration: 1,
                 });
             });
+        }, (e) => {
+            this.progressFn(e);
         });
     }
     initMoon() {
         let loader = new GLTFLoader();
         loader.setDRACOLoader(this.dracoLoader);
         loader.load("./texture/glb/moon.glb", (gltf) => {
-                let moon = gltf.scene.children[0];
-                for (let j = 0; j < 10; j++) {
-                    let moonInstance = new THREE.InstancedMesh(
-                        moon.geometry,
-                        moon.material,
-                        100
-                    );
+            let moon = gltf.scene.children[0];
+            for (let j = 0; j < 10; j++) {
+                let moonInstance = new THREE.InstancedMesh(
+                    moon.geometry,
+                    moon.material,
+                    100
+                );
 
-                    // scene.add(moon);
-                    for (let i = 0; i < 100; i++) {
-                        let x = Math.random() * 1000 - 500;
-                        let y = Math.random() * 1000 - 500;
-                        let z = Math.random() * 1000 - 500;
+                // scene.add(moon);
+                for (let i = 0; i < 100; i++) {
+                    let x = Math.random() * 1000 - 500;
+                    let y = Math.random() * 1000 - 500;
+                    let z = Math.random() * 1000 - 500;
 
-                        let matrix = new THREE.Matrix4();
-                        let size = Math.random() * 20 - 8;
-                        matrix.makeScale(size, size, size);
-                        matrix.makeTranslation(x, y, z);
-                        moonInstance.setMatrixAt(i, matrix);
-                    }
-
-                    gsap.to(moonInstance.position, {
-                        duration: Math.random() * 10 + 2,
-                        z: -1000,
-                        ease: "linear",
-                        repeat: -1,
-                    });
-                    this.scene.add(moonInstance);
+                    let matrix = new THREE.Matrix4();
+                    let size = Math.random() * 20 - 8;
+                    matrix.makeScale(size, size, size);
+                    matrix.makeTranslation(x, y, z);
+                    moonInstance.setMatrixAt(i, matrix);
                 }
-            })
-        }
-        addMesh() {
+
+                gsap.to(moonInstance.position, {
+                    duration: Math.random() * 10 + 2,
+                    z: -1000,
+                    ease: "linear",
+                    repeat: -1,
+                });
+                this.scene.add(moonInstance);
+            }
+        }, (e) => {
+            this.progressFn(e);
+        })
+    }
+    addMesh() {
+        return new Promise((resolve, reject) => {
             this.initGltf();
             this.initMoon();
-        }
-        onWindowResize() {
-            this.camera.aspect = window.innerWidth / window.innerHeight;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-            // this.render();
-        }
-        onMouseWheel(e) {
-            var fov = this.camera.fov;
-            var near = this.camera.near;
-            var far = this.camera.far;
-            e.preventDefault();
-            //e.stopPropagation();
-            if (e.wheelDelta) { //判断浏览器IE，谷歌滑轮事件
-                if (e.wheelDelta > 0) { //当滑轮向上滚动时
-                    fov -= (near < fov ? 1 : 0);
-                }
-                if (e.wheelDelta < 0) { //当滑轮向下滚动时
-                    fov += (fov < far ? 1 : 0);
-                }
-            } else if (e.detail) { //Firefox滑轮事件
-                if (e.detail > 0) { //当滑轮向上滚动时
-                    fov -= 1;
-                }
-                if (e.detail < 0) { //当滑轮向下滚动时
-                    fov += 1;
-                }
-            }
-            this.camera.fov = fov;
-            this.camera.updateProjectionMatrix();
-        }
+        })
     }
-    export default Login3d;
+    addProgress(){
+        let ans = this.addMesh();
+        this.onFinish(ans);
+    }
+    onWindowResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        // this.render();
+    }
+    onMouseWheel(e) {
+        var fov = this.camera.fov;
+        var near = this.camera.near;
+        var far = this.camera.far;
+        e.preventDefault();
+        //e.stopPropagation();
+        if (e.wheelDelta) { //判断浏览器IE，谷歌滑轮事件
+            if (e.wheelDelta > 0) { //当滑轮向上滚动时
+                fov -= (near < fov ? 1 : 0);
+            }
+            if (e.wheelDelta < 0) { //当滑轮向下滚动时
+                fov += (fov < far ? 1 : 0);
+            }
+        } else if (e.detail) { //Firefox滑轮事件
+            if (e.detail > 0) { //当滑轮向上滚动时
+                fov -= 1;
+            }
+            if (e.detail < 0) { //当滑轮向下滚动时
+                fov += 1;
+            }
+        }
+        this.camera.fov = fov;
+        this.camera.updateProjectionMatrix();
+    }
+}
+export default Login3d;

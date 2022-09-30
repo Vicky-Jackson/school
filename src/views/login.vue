@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <div v-show="data.isLoading">
+        <loading :progress="data.progress"></loading>
+    </div>
+    <div v-show="!data.isLoading">
         <div id="login" class="login"></div>
         <div id="page" class="login">
             <h2 class="title">欢迎智慧校园管理系统</h2>
@@ -26,14 +29,25 @@ import {
     reactive, onMounted
 } from 'vue'
 import axios from "axios"
+import Loading from "../components/Loading.vue"
 const data = reactive({
     login3d: {},
     username:'',
-    pass:''
+    pass:'',
+    isLoading:true,
+    progress:0
 })
 const router = useRouter();
+function loadingFinish(){
+    data.isLoading=false;
+}
 onMounted(() => {
-    data.login3d = new Login3d('.login')
+    data.login3d = new Login3d('.login',loadingFinish);
+    data.login3d.onProgress((e)=>{
+        let progressNum = e.loaded / e.total;
+        progressNum = progressNum.toFixed(2) * 100;
+        data.progress = progressNum;
+    })
 })
 const query = ()=>{
     let username = data.username;

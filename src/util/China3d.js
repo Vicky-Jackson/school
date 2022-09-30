@@ -29,11 +29,10 @@ class China3d {
         this.clock = new THREE.Clock();
         this.onFinish = onFinish;
         this.init();
-        
         this.progressFn;
     }
-    onprogress(fn) {
-        fn.progressFn = progressFn;
+    onProgress(fn) {
+        this.progressFn = fn;
     }
     //初始化
     init() {
@@ -47,7 +46,7 @@ class China3d {
         // 控制器
         this.initControls();
         // 添加物体
-        this.addMesh();
+        this.addProgress();
 
         this.initGroup();
         this.setRaycaster();
@@ -108,11 +107,20 @@ class China3d {
         this.controls.enableDamping = true;
     }
     addMesh() {
-        const loader = new THREE.FileLoader()
-        loader.load('/texture/China/china.json', (data) => {
-            const jsondata = JSON.parse(data);
-            this.generateGeometry(jsondata)
+        return new Promise((resolve, reject) => {
+            const loader = new THREE.FileLoader()
+            loader.load('/texture/China/china.json', (data) => {
+                const jsondata = JSON.parse(data);
+                this.generateGeometry(jsondata)
+            }, (e) => {
+                this.progressFn(e);
+            })
         })
+
+    }
+    addProgress() {
+        let ans = this.addMesh();
+        this.onFinish(ans);
     }
     generateGeometry(jsondata) {
         // 初始化一个地图对象
@@ -179,59 +187,59 @@ class China3d {
         })
         this.scene.add(this.map)
     }
-     setRaycaster() {
-         this.raycaster = new THREE.Raycaster()
-         this.mouse = new THREE.Vector2()
-         this.tooltip = document.getElementById('tooltip')
-         //document.appendChild(this.tooltip);
-         const onMouseMove = (event) => {
-             this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-             this.tooltip.style.left = event.clientX + 2 + 'px'
-             this.tooltip.style.top = event.clientY + 2 + 'px'
-         }
+    setRaycaster() {
+        this.raycaster = new THREE.Raycaster()
+        this.mouse = new THREE.Vector2()
+        this.tooltip = document.getElementById('tooltip')
+        //document.appendChild(this.tooltip);
+        const onMouseMove = (event) => {
+            this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+            this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+            this.tooltip.style.left = event.clientX + 2 + 'px'
+            this.tooltip.style.top = event.clientY + 2 + 'px'
+        }
 
-         window.addEventListener('mousemove', onMouseMove, false)
-     }
-      animate() {
-          requestAnimationFrame(this.animate.bind(this))
-          // 通过摄像机和鼠标位置更新射线
-          this.raycaster.setFromCamera(this.mouse, this.camera)
-          // 算出射线 与当场景相交的对象有那些
-          const intersects = this.raycaster.intersectObjects(
-              this.scene.children,
-              true
-          )
-          // 恢复上一次清空的
-          if (this.lastPick) {
-              this.lastPick.object.material[0].color.set('#2defff')
-              this.lastPick.object.material[1].color.set('#3480C4')
-          }
-          this.lastPick = null
-          this.lastPick = intersects.find(
-              (item) => item.object.material && item.object.material.length === 2
-          )
-          if (this.lastPick) {
-              this.lastPick.object.material[0].color.set(0xff0000)
-              this.lastPick.object.material[1].color.set(0xff0000)
-          }
-          this.showTip()
-          this.render()
-      }
+        window.addEventListener('mousemove', onMouseMove, false)
+    }
+    animate() {
+        requestAnimationFrame(this.animate.bind(this))
+        // 通过摄像机和鼠标位置更新射线
+        this.raycaster.setFromCamera(this.mouse, this.camera)
+        // 算出射线 与当场景相交的对象有那些
+        const intersects = this.raycaster.intersectObjects(
+            this.scene.children,
+            true
+        )
+        // 恢复上一次清空的
+        if (this.lastPick) {
+            this.lastPick.object.material[0].color.set('#2defff')
+            this.lastPick.object.material[1].color.set('#3480C4')
+        }
+        this.lastPick = null
+        this.lastPick = intersects.find(
+            (item) => item.object.material && item.object.material.length === 2
+        )
+        if (this.lastPick) {
+            this.lastPick.object.material[0].color.set(0xff0000)
+            this.lastPick.object.material[1].color.set(0xff0000)
+        }
+        this.showTip()
+        this.render()
+    }
 
-      showTip() {
-          // 显示省份的信息
-          if (this.lastPick) {
-              const properties = this.lastPick.object.parent.properties
+    showTip() {
+        // 显示省份的信息
+        if (this.lastPick) {
+            const properties = this.lastPick.object.parent.properties
 
-              this.tooltip.textContent = properties.name
+            this.tooltip.textContent = properties.name
 
-              this.tooltip.style.visibility = 'visible'
-          } else {
-              this.tooltip.style.visibility = 'hidden'
-          }
-          //document.appendChild(this.tooltip);
-      }
+            this.tooltip.style.visibility = 'visible'
+        } else {
+            this.tooltip.style.visibility = 'hidden'
+        }
+        //document.appendChild(this.tooltip);
+    }
 
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;

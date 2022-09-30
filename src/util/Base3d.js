@@ -28,8 +28,8 @@ class Base3d {
         this.animate();
         this.progressFn;
     }
-    onprogress(fn) {
-        fn.progressFn = progressFn;
+    onProgress(fn) {
+        this.progressFn = fn;
     }
     //初始化
     init() {
@@ -43,7 +43,7 @@ class Base3d {
         // 控制器
         this.initControls();
         // 添加物体
-        this.addMesh();
+        this.addProgress();
 
         this.initGroup();
 
@@ -102,34 +102,34 @@ class Base3d {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
     }
-    initSprite(){
+    initSprite() {
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
-         //canvas 实体
-         context.fillStyle = "rgba(0,0,0,0.5)"; //填充带透明颜色
-         context.fillRect(0, 0, 140, 50); //x,y,width,height
-         //canvas 边框
-         context.lineJoin = "round";
-         context.lineCap = 'round';
-         context.miterLimit = 0;
-         context.lineWidth = 5; //borderWidth
-         context.strokeStyle = "#17fe6d";
-         context.strokeRect(0, 0, 140, 50);
-         //canvas 文字
-         context.fillStyle = "#fff";
-         context.font = "24px bold Arial";
-         context.fillText("教学楼", 30, 30);
+        //canvas 实体
+        context.fillStyle = "rgba(0,0,0,0.5)"; //填充带透明颜色
+        context.fillRect(0, 0, 140, 50); //x,y,width,height
+        //canvas 边框
+        context.lineJoin = "round";
+        context.lineCap = 'round';
+        context.miterLimit = 0;
+        context.lineWidth = 5; //borderWidth
+        context.strokeStyle = "#17fe6d";
+        context.strokeRect(0, 0, 140, 50);
+        //canvas 文字
+        context.fillStyle = "#fff";
+        context.font = "24px bold Arial";
+        context.fillText("教学楼", 30, 30);
 
-         var texture = new THREE.Texture(canvas);
-         texture.needsUpdate = true;
-          var material = new THREE.SpriteMaterial({
-              map: texture
-          });
-          var mesh = new THREE.Sprite(material);
-          /*4、放大图片，每个精灵有自己的大小，默认情况下都是很小的，如果你不放大，基本是看不到的*/
-          mesh.scale.set(20, 20, 1);
-          
-          return mesh;
+        var texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        var material = new THREE.SpriteMaterial({
+            map: texture
+        });
+        var mesh = new THREE.Sprite(material);
+        /*4、放大图片，每个精灵有自己的大小，默认情况下都是很小的，如果你不放大，基本是看不到的*/
+        mesh.scale.set(20, 20, 1);
+
+        return mesh;
     }
     initBuilding() {
         const loader = new GLTFLoader();
@@ -139,39 +139,51 @@ class Base3d {
             box.getCenter(gltf.scene.position);
             gltf.scene.position.multiplyScalar(-1);
             //this.group = new THREE.Group();
-            
+
             //console.log(gltf.scene);
             var mesh = this.initSprite();
             mesh.position.set(80, 25, -320);
             //console.log(mesh)
             model.add(mesh);
-            this.scene.add(this.group);
-            this.group.add(gltf.scene);
+            this.scene.add(gltf.scene);
+            //this.group.add(gltf.scene);
 
-        }, undefined, function (error) {
+        }, (e) => {
+            this.progressFn(e);
+        }, function (error) {
             console.error(error);
         });
     }
     initRobot() {
         const loader = new GLTFLoader();
         loader.load('/texture/RobotExpressive/RobotExpressive.glb', (gltf) => {
-            gltf.scene.position.y = -19;
-            gltf.scene.scale.set(2, 2, 2);
-            console.log(gltf.animations);
-            this.scene.add(this.group);
-            this.group.add(gltf.scene);
-            //console.log(this.group);
-            //console.log(gltf.scene);
+                gltf.scene.position.y = -19;
+                gltf.scene.scale.set(2, 2, 2);
+                console.log(gltf.animations);
+                this.scene.add(gltf.scene);
+                //this.group.add(gltf.scene);
+                //console.log(this.group);
+                //console.log(gltf.scene);
 
-        }, undefined, function (error) {
-            console.error(error);
-        });
+            }, (e) => {
+                this.progressFn(e);
+            },
+            function (error) {
+                console.error(error);
+            });
     }
     addMesh() {
-        this.initBuilding();
-        this.initRobot();
+        return new Promise((resolve, reject) => {
+            this.initBuilding();
+            this.initRobot();
+        })
+
     }
-    
+    addProgress() {
+        let ans = this.addMesh();
+        this.onFinish(ans);
+    }
+
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
@@ -203,7 +215,7 @@ class Base3d {
         this.camera.updateProjectionMatrix();
     }
 
-    
+
 }
 
 export default Base3d;
