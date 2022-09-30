@@ -10,18 +10,27 @@ import {
 import {
     GLTFLoader
 } from "three/examples/jsm/loaders/GLTFLoader";
-
+import {
+    GUI
+}
+from 'three/examples/jsm/libs/lil-gui.module.min.js';
 class Base3d {
     constructor(selector, onFinish) {
         this.container = document.querySelector(selector);
         this.camera;
         this.group;
+        this.actions;
+        this.activeAction;
+        this.mixer;
+        this.gui;
+        this.model = null;
         this.scene;
         this.controls;
         this.renderer;
         this.model;
         this.selectObject;
         this.animateAction;
+        this.progress = 0;
         this.clock = new THREE.Clock();
         this.onFinish = onFinish;
         this.init();
@@ -46,7 +55,7 @@ class Base3d {
         this.addProgress();
 
         this.initGroup();
-
+        this.makeCurve();
         // 监听场景大小改变，调整渲染尺寸
         window.addEventListener("resize", this.onWindowResize.bind(this));
 
@@ -93,9 +102,12 @@ class Base3d {
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
+        this.moveOnCurve();
         this.renderer.render(this.scene, this.camera);
     }
     animate() {
+        //requestAnimationFrame(animate);
+        
         this.renderer.setAnimationLoop(this.render.bind(this));
     }
     initControls() {
@@ -159,8 +171,10 @@ class Base3d {
         loader.load('/texture/RobotExpressive/RobotExpressive.glb', (gltf) => {
                 gltf.scene.position.y = -19;
                 gltf.scene.scale.set(2, 2, 2);
-                console.log(gltf.animations);
+                //console.log(gltf.animations);
                 this.scene.add(gltf.scene);
+                this.model = gltf.scene;
+                this.createGUI(gltf.scene, gltf.animations);
                 //this.group.add(gltf.scene);
                 //console.log(this.group);
                 //console.log(gltf.scene);
@@ -171,6 +185,112 @@ class Base3d {
             function (error) {
                 console.error(error);
             });
+    }
+
+    createGUI(model, animations) {
+        const states = ['Idle', 'Walking', 'Running', 'Dance'];
+
+        this.gui = new GUI();
+
+        this.mixer = new THREE.AnimationMixer(model);
+
+        this.actions = {};
+
+        for (let i = 0; i < animations.length; i++) {
+            const clip = animations[i];
+            const action = this.mixer.clipAction(clip);
+            this.actions[clip.name] = action;
+        }
+
+        const statesFolder = this.gui.addFolder('States');
+        const api = {
+            state: 'Walking'
+        };
+        const clipCtrl = statesFolder.add(api, 'state').options(states);
+
+        clipCtrl.onChange(()=> {
+
+            this.fadeToAction(api.state, 0.5);
+
+        });
+
+        statesFolder.open();
+
+        this.activeAction = this.actions['Walking'];
+        //console.log(this.activeAction);
+        this.activeAction.play();
+    }
+
+    fadeToAction(name, duration) {
+
+        let previousAction = this.activeAction;
+        this.activeAction = this.actions[name];
+
+        if (previousAction !== this.activeAction) {
+
+            previousAction.fadeOut(duration);
+
+        }
+
+        this.activeAction
+            .reset()
+            .setEffectiveTimeScale(1)
+            .setEffectiveWeight(1)
+            .fadeIn(duration)
+            .play();
+
+    }
+    makeCurve() {
+        //Create a closed wavey loop
+        this.curve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0, -19, 0),
+            new THREE.Vector3(-20, -19, -100),
+            new THREE.Vector3(0, -19, -100)
+        ]);
+        this.curve.curveType = "catmullrom";
+        //this.curve.closed = true; //设置是否闭环
+        this.curve.tension = 0.5; //设置线的张力，0为无弧度折线
+
+        // 为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
+        const points = this.curve.getPoints(50);
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({
+            color: 0x000000
+        });
+
+        // Create the final object to add to the scene
+        const curveObject = new THREE.Line(geometry, material);
+        this.scene.add(curveObject)
+    }
+    moveOnCurve() {
+        if (this.curve == null || this.model == null) {
+            console.log('Loading')
+        } else {
+            let velocity = 0.001;
+            if (this.progress <= 1 - velocity) {
+                const point = this.curve.getPointAt(this.progress); //获取样条曲线指定点坐标
+                const pointBox = this.curve.getPointAt(this.progress + velocity); //获取样条曲线指定点坐标
+
+                if (point && pointBox) {
+                    this.model.position.set(point.x, point.y, point.z);
+                    this.model.lookAt(pointBox.x, pointBox.y, pointBox.z);//因为这个模型加载进来默认面部是正对Z轴负方向的，所以直接lookAt会导致出现倒着跑的现象，这里用重新设置朝向的方法来解决。
+
+                    var targetPos = pointBox //目标位置点
+                    var offsetAngle = 0 //目标移动时的朝向偏移
+
+                    // //以下代码在多段路径时可重复执行
+                    var mtx = new THREE.Matrix4() //创建一个4维矩阵
+                    // .lookAt ( eye : Vector3, target : Vector3, up : Vector3 ) : this,构造一个旋转矩阵，从eye 指向 target，由向量 up 定向。
+                    //mtx.lookAt(this.model.position, targetPos, this.model.up) //设置朝向
+                    mtx.multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0, offsetAngle, 0)))
+                    var toRot = new THREE.Quaternion().setFromRotationMatrix(mtx) //计算出需要进行旋转的四元数值
+                    this.model.quaternion.slerp(toRot, 0.2)
+                }
+                this.progress += velocity;
+            } else {
+                this.progress = 0;
+            }
+        }
     }
     addMesh() {
         return new Promise((resolve, reject) => {
