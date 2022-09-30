@@ -1,10 +1,15 @@
 <template>
+    <h1 id="title" align="center">新生数据可视化</h1>
     <div v-show="data.isLoading">
         <loading :progress="data.progress"></loading>
     </div>
     <div id = "number" v-show="!data.isLoading">
-        <div id="number" class="number"></div>
-        <div id="tooltip" class="number"></div>
+        <div id="number"></div>
+        <div id="tooltip"></div>
+        
+    </div>
+    <div id="echarts">
+        <echarts></echarts>
     </div>
 </template>
 
@@ -14,6 +19,7 @@ import {
     reactive, onMounted
 } from 'vue'
 import Loading from "../components/Loading.vue";
+import Echarts from '../components/echarts.vue'
 const data = reactive({
     number3d: {},
     progress:0,
@@ -33,6 +39,11 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+#title{
+    background-color: black;
+    color: white;
+    
+}
 #tooltip {
     position: absolute;
     width: auto;
@@ -43,4 +54,9 @@ onMounted(() => {
     border-radius: 2px;
     visibility: hidden;
 }
+#echarts{
+    position:absolute; 
+    top:50px;
+}
+
 </style>
