@@ -27,6 +27,7 @@ class Base3d {
         this.scene;
         this.controls;
         this.renderer;
+        this.time = 0;
         this.model;
         this.selectObject;
         this.animateAction;
@@ -107,7 +108,7 @@ class Base3d {
     }
     animate() {
         //requestAnimationFrame(animate);
-        
+
         this.renderer.setAnimationLoop(this.render.bind(this));
     }
     initControls() {
@@ -170,6 +171,7 @@ class Base3d {
         const loader = new GLTFLoader();
         loader.load('/texture/RobotExpressive/RobotExpressive.glb', (gltf) => {
                 gltf.scene.position.y = -19;
+                gltf.scene.rotation.set(0, -Math.PI, 0);
                 gltf.scene.scale.set(2, 2, 2);
                 //console.log(gltf.animations);
                 this.scene.add(gltf.scene);
@@ -204,11 +206,11 @@ class Base3d {
 
         const statesFolder = this.gui.addFolder('States');
         const api = {
-            state: 'Walking'
+            state: 'Running'
         };
         const clipCtrl = statesFolder.add(api, 'state').options(states);
 
-        clipCtrl.onChange(()=> {
+        clipCtrl.onChange(() => {
 
             this.fadeToAction(api.state, 0.5);
 
@@ -216,7 +218,7 @@ class Base3d {
 
         statesFolder.open();
 
-        this.activeAction = this.actions['Walking'];
+        this.activeAction = this.actions['Running'];
         //console.log(this.activeAction);
         this.activeAction.play();
     }
@@ -244,15 +246,21 @@ class Base3d {
         //Create a closed wavey loop
         this.curve = new THREE.CatmullRomCurve3([
             new THREE.Vector3(0, -19, 0),
-            new THREE.Vector3(-20, -19, -100),
-            new THREE.Vector3(0, -19, -100)
+            new THREE.Vector3(0, -19, -65),
+            new THREE.Vector3(70, -19, -65),
+            new THREE.Vector3(70, -19, -100),
+            new THREE.Vector3(-25, -19, -100),
+            new THREE.Vector3(-25, -19, -76),
+            new THREE.Vector3(-68, -19, -76),
+            new THREE.Vector3(-68, -19, 20),
+            new THREE.Vector3(-10, -19, 20),
         ]);
         this.curve.curveType = "catmullrom";
-        //this.curve.closed = true; //设置是否闭环
+        this.curve.closed = true; //设置是否闭环
         this.curve.tension = 0.5; //设置线的张力，0为无弧度折线
 
         // 为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
-        const points = this.curve.getPoints(50);
+        const points = this.curve.getPoints(3000);
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
             color: 0x000000
@@ -266,29 +274,37 @@ class Base3d {
         if (this.curve == null || this.model == null) {
             console.log('Loading')
         } else {
-            let velocity = 0.001;
-            if (this.progress <= 1 - velocity) {
-                const point = this.curve.getPointAt(this.progress); //获取样条曲线指定点坐标
-                const pointBox = this.curve.getPointAt(this.progress + velocity); //获取样条曲线指定点坐标
+            // 把曲线分割成2999段， 可以得到3000个点
+            let points = this.curve.getPoints(3000);
+            // 更新取点索引
+            this.time += 3;
+            // 相机所在点索引
+            const index1 = this.time % 3000;
+            // 前方机器人所在位置点的索引
+            const index2 = (this.time + 70) % 3000;
+            // 根据索引取点
+            let point = points[index1];
+            let point1 = points[index2];
+            // 修改相机和模型位置
+            //this.model.rotateZ = Math.PI / 2;
+            if (point && point.x) {
+                if (this.model) {
+                    this.model.position.set(point1.x, point1.y, point1.z);
+                    //this.model.lookAt(point.x, point.y, point.z);
 
-                if (point && pointBox) {
-                    this.model.position.set(point.x, point.y, point.z);
-                    this.model.lookAt(pointBox.x, pointBox.y, pointBox.z);//因为这个模型加载进来默认面部是正对Z轴负方向的，所以直接lookAt会导致出现倒着跑的现象，这里用重新设置朝向的方法来解决。
-
-                    var targetPos = pointBox //目标位置点
-                    var offsetAngle = 0 //目标移动时的朝向偏移
-
-                    // //以下代码在多段路径时可重复执行
-                    var mtx = new THREE.Matrix4() //创建一个4维矩阵
-                    // .lookAt ( eye : Vector3, target : Vector3, up : Vector3 ) : this,构造一个旋转矩阵，从eye 指向 target，由向量 up 定向。
-                    //mtx.lookAt(this.model.position, targetPos, this.model.up) //设置朝向
-                    mtx.multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0, offsetAngle, 0)))
-                    var toRot = new THREE.Quaternion().setFromRotationMatrix(mtx) //计算出需要进行旋转的四元数值
-                    this.model.quaternion.slerp(toRot, 0.2)
                 }
-                this.progress += velocity;
-            } else {
-                this.progress = 0;
+                this.camera.position.set(point.x, -10, point.z);
+                this.camera.lookAt(point1.x, -10, point1.z);
+                var targetPos = point //目标位置点
+                var offsetAngle = 0 //目标移动时的朝向偏移
+
+                // //以下代码在多段路径时可重复执行
+                var mtx = new THREE.Matrix4() //创建一个4维矩阵
+                // .lookAt ( eye : Vector3, target : Vector3, up : Vector3 ) : this,构造一个旋转矩阵，从eye 指向 target，由向量 up 定向。
+                mtx.lookAt(this.model.position, targetPos, this.model.up) //设置朝向
+                mtx.multiply(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0, offsetAngle, 0)))
+                var toRot = new THREE.Quaternion().setFromRotationMatrix(mtx) //计算出需要进行旋转的四元数值
+                this.model.quaternion.slerp(toRot, 0.2)
             }
         }
     }
