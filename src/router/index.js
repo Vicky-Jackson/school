@@ -6,7 +6,7 @@ import {
 import Home from "../views/home.vue";
 import Number from "../views/number.vue";
 import Login from "../views/login.vue";
-//import Test from "../views/test.vue";
+import Map from "../views/map.vue";
 
 
 const routes = [{
@@ -23,6 +23,11 @@ const routes = [{
         path: "/login",
         name: "login",
         component: Login
+    },
+    {
+        path: "/map",
+        name: "map",
+        component: Map
     },
 ];
 
