@@ -8,6 +8,7 @@ import Number from "../views/number.vue";
 import Login from "../views/login.vue";
 import Map from "../views/map.vue";
 import Students from "../views/message.vue";
+import Timetable from "../views/timetable.vue";
 
 const routes = [{
         path: "/",
@@ -33,6 +34,11 @@ const routes = [{
         path: "/students",
         name: "students",
         component: Students
+    },
+    {
+        path: "/timetable",
+        name: "timetable",
+        component: Timetable
     },
 ];
 
