@@ -1,7 +1,7 @@
 <template>
     <div class="nav">
         <div class="goods-box w">
-            <card v-for="o in 6" :key="o">
+            <card v-for="(student,o) in data.message" :key="o" :message="student">
             </card>
         </div>
     </div>
@@ -12,6 +12,18 @@
 
 <script setup>
 import Card from '../components/card.vue'
+import axios from 'axios'
+import { reactive, onMounted } from 'vue';
+
+const data = reactive({
+    message: {}
+})
+axios
+.get('/api/user/getStudents', {})
+.then((res) => { 
+    data.message = res.data;
+    console.log(data.message)
+    });
 </script>
 
 <style lang="less" scoped>
@@ -19,9 +31,11 @@ import Card from '../components/card.vue'
     width: 1220px;
     margin: 0 auto;
 }
+
 .nav {
     height: 60px;
     line-height: 60px;
+
     >div {
         display: flex;
         align-items: center;
@@ -33,7 +47,7 @@ import Card from '../components/card.vue'
 
         >div {
             float: left;
-            
+
         }
     }
 }

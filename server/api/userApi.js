@@ -19,18 +19,18 @@ var jsonWrite = (res, ret) => {
 };
 // 增加用户接口
 // POST 请求
-router.post('/addUser', (req, res) => {
-    var sql = $sql.user.add;
-    var params = req.body;
-    console.log(params);
-    // ! [params.username, params.age] 自动填充到之前 ？ 里面
-    conn.query(sql, [params.id, params.name, params.age], (err, result) => {
-        if (err) return console.log(err);
-        if (result) {
-            jsonWrite(res, result);
-        }
-    });
-});
+// router.post('/addUser', (req, res) => {
+//     var sql = $sql.user.add;
+//     var params = req.body;
+//     console.log(params);
+//     // ! [params.username, params.age] 自动填充到之前 ？ 里面
+//     conn.query(sql, [params.id, params.name, params.age], (err, result) => {
+//         if (err) return console.log(err);
+//         if (result) {
+//             jsonWrite(res, result);
+//         }
+//     });
+// });
 // GET 请求
 // router.get('/getUser', (req, res) => {
 //     let sql = $sql.user.get;
@@ -46,11 +46,26 @@ router.post('/addUser', (req, res) => {
 // module.exports = router;
 
 router.post('/getUser', (req, res) => {
-    let sql = $sql.user.get;
+    let sql = $sql.user.getUser;
     let params = req.body;
     console.log(params);
 
     conn.query(sql, [params.username,params.password], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getStudents', (req, res) => {
+    let sql = $sql.user.getStudents;
+    let params = req.body;
+    console.log(params);
+
+    conn.query(sql,(err, result) => {
         if (err) {
             console.log(err);
         }

@@ -135,6 +135,7 @@ class test3d {
         loader.setDRACOLoader(this.dracoLoader);
         loader.load("./texture/timetable/timetable.gltf", (gltf) => {
             gltf.scene.position.set(3, 0, 0);
+            console.log(gltf.scene);
             this.scene.add(gltf.scene);
         }, (e) => {
             

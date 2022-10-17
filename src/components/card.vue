@@ -4,9 +4,9 @@
             <el-card :body-style="{ padding: '0px' }">
                 <img class='image' src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png">
                 <div>
-                    <span>姓名：aaaa</span>
+                    <span>姓名：{{message.message.s_name}}</span>
                     <div>
-                        <span>年龄：13</span>
+                        <span>性别：{{message.message.sex}}</span>
                     </div>
                 </div>
             </el-card>
@@ -15,9 +15,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-const currentDate = ref(new Date())
+const message = defineProps({
+    message:{}
+})
 </script>
 
 <style lang="less" scoped>
