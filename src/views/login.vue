@@ -8,10 +8,10 @@
             <h2 class="title">欢迎智慧校园管理系统</h2>
             <el-form label-width="100px" class="demo-ruleForm" :model="data">
                 <el-form-item label="用户名">
-                    <el-input v-model="data.username"></el-input>
+                    <el-input v-model="data.loginData.username"></el-input>
                 </el-form-item>
                 <el-form-item label="密码">
-                    <el-input type="password" v-model="data.pass" show-password></el-input>
+                    <el-input type="password" v-model="data.loginData.pass" show-password></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="query">登录</el-button>
@@ -29,15 +29,25 @@ import {
     reactive, onMounted
 } from 'vue'
 import axios from "axios"
+import store from '../store/index.js'
 import Loading from "../components/Loading.vue"
 const data = reactive({
     login3d: {},
-    username:'',
-    pass:'',
     isLoading:true,
-    progress:0
+    progress:0,
+    loginData:{
+        username:'',
+        pass:''
+    }
 })
 const router = useRouter();
+const handleLogin = () => {
+    store.commit('setUserInfo', data.loginData)
+    //跳转到  /index  页面
+    router.push({
+        path: '/index'
+    })
+}
 function loadingFinish(){
     data.isLoading=false;
 }
@@ -50,13 +60,17 @@ onMounted(() => {
     })
 })
 const query = ()=>{
-    let username = data.username;
-    let password = data.pass;
     axios
-        .post("/api/user/getUser", { username, password }, {})
+        .post("/api/user/getUser", data.loginData, {})
         .then((res) => {
             if (res.status == 200) {
-                router.push({ path: '/' });
+                store.commit('setUserInfo', data.loginData)
+                localStorage.setItem('loginData', JSON.stringify(data.loginData))
+
+                //跳转到  /index  页面
+                router.push({
+                    path: '/'
+                })
             }
         })
         .catch((error) => {

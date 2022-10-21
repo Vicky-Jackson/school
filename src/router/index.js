@@ -3,6 +3,7 @@ import {
      createWebHashHistory,
      createWebHistory
 } from "vue-router";
+import store from '../store/index.js'
 import Home from "../views/home.vue";
 import Number from "../views/number.vue";
 import Login from "../views/login.vue";
@@ -52,5 +53,25 @@ const router = createRouter
     history: createWebHistory(),
     routes,
 });
+
+router.beforeEach((to, from, next) => {
+    // to: 从哪个页面
+    // from: 到哪个页面
+    // next: 只有执行next()页面
+
+    //判断用户是否登录
+    console.log('store', store.state)
+    if (!store.state.userInfo.username) {
+        // 未登录，跳转到login页面
+        if (to.path === '/login') {
+            next()
+            return
+        }
+        next('/login')
+    } else {
+        // 已登录
+        next()
+    }
+})
 
 export default router

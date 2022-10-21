@@ -92,9 +92,9 @@ class test3d {
             45,
             window.innerWidth / window.innerHeight,
             0.1,
-            100000
+            1000
         );
-        this.camera.position.set(0, 0, 10);
+        this.camera.position.set(5, 15, 0);
 
     }
     initRenderer() {
@@ -123,6 +123,31 @@ class test3d {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
     }
+    initSprite() {
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            //canvas 实体
+            context.fillStyle = "rgba(0,0,0,0)"; //填充带透明颜色
+            context.fillRect(0, 0, 140, 50); //x,y,width,height
+           
+            //canvas 文字
+            context.fillStyle = "black";
+            context.font = "24px bold Arial";
+            context.fillText("Math", 30, 30);
+
+            //生成图片
+            let url = canvas.toDataURL('image/png');
+            //将图片构建到纹理中
+            let geometry1 = new THREE.PlaneGeometry(3, 3)
+            let material1 = new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(url),
+                side: THREE.DoubleSide,
+                opacity: 1,
+                transparent: true,
+            })
+            let rect = new THREE.Mesh(geometry1, material1)
+            return rect;
+        }
     initDraco() {
         this.dracoLoader = new DRACOLoader();
         this.dracoLoader.setDecoderPath("./draco/gltf/");
@@ -134,9 +159,17 @@ class test3d {
         let loader = new GLTFLoader();
         loader.setDRACOLoader(this.dracoLoader);
         loader.load("./texture/timetable/timetable.gltf", (gltf) => {
-            gltf.scene.position.set(3, 0, 0);
-            console.log(gltf.scene);
+            gltf.scene.position.set(0, 0, 0);
+            console.log(gltf.scene.getObjectByName('课程12')); 
+            const x = gltf.scene.getObjectByName('课程11').position.x;
+            const y = gltf.scene.getObjectByName('课程11').position.y;
+            const z = gltf.scene.getObjectByName('课程11').position.z;
+            var mesh = this.initSprite();
+            mesh.position.set(x+1,y+0.1,z-0.8)
+            mesh.rotation.set(-Math.PI / 2,0 , Math.PI / 2)
+            gltf.scene.add(mesh);
             this.scene.add(gltf.scene);
+
         }, (e) => {
             
         });
