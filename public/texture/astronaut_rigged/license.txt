@@ -1,0 +1,11 @@
+Model Information:
+* title:	Astronaut Rigged
+* source:	https://sketchfab.com/3d-models/astronaut-rigged-6a760b96cea74418ae6b0ace3c284b01
+* author:	CrappyTestAccount (https://sketchfab.com/testcrap)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Astronaut Rigged" (https://sketchfab.com/3d-models/astronaut-rigged-6a760b96cea74418ae6b0ace3c284b01) by CrappyTestAccount (https://sketchfab.com/testcrap) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

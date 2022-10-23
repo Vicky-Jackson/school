@@ -2,7 +2,7 @@ import { createStore } from "vuex";
 
 const store = createStore({
     state:{
-         userInfo: (localStorage.getItem('loginData') && JSON.parse(localStorage.getItem('loginData'))) || {}
+         userInfo: (sessionStorage.getItem('loginData') && JSON.parse(sessionStorage.getItem('loginData'))) || {}
     },
     mutations:{
         setUserInfo(state, uInfo) {

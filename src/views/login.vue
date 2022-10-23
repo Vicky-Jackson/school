@@ -65,7 +65,7 @@ const query = ()=>{
         .then((res) => {
             if (res.status == 200) {
                 store.commit('setUserInfo', data.loginData)
-                localStorage.setItem('loginData', JSON.stringify(data.loginData))
+                sessionStorage.setItem('loginData', JSON.stringify(data.loginData))
 
                 //跳转到  /index  页面
                 router.push({
