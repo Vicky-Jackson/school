@@ -3,7 +3,12 @@
     <loading :progress="data.progress"></loading>
     </div>
     <div id="home" v-show="!data.isLoading">
-        <router-link to="/number">新生数据</router-link>
+        <div id="number">
+            <router-link to="/number">新生数据</router-link>
+        </div>
+        <router-link to="/message">学生信息</router-link>
+        <router-link to="/map">签到</router-link>
+        <router-link to="/timetable">课程表</router-link>
     </div>
     
 </template>
@@ -11,6 +16,7 @@
 <script setup>
 import Home3d from '../util/Home3d'
 import Base3d from '../components/base3d.vue'
+import { Icon } from '@iconify/vue';
 import{
     reactive,onMounted
 } from 'vue'

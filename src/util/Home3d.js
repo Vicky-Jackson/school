@@ -74,6 +74,7 @@ class Home3d {
         // this.scene.setEnvMap('000');
         this.scene.background = new THREE.Color("#D2B48C");
         this.scene.add(new THREE.AmbientLight(0x999999));
+        
     }
     initCamera() {
         this.camera = new THREE.PerspectiveCamera(
@@ -189,6 +190,25 @@ class Home3d {
                 console.error(error);
             });
     }
+
+    // initGrass() {
+    //      const loader = new GLTFLoader();
+    //      loader.load('/texture/grass/scene.gltf', (gltf) => {
+    //              let model = gltf.scene;
+    //              //model.position.set(20,-50,0);
+    //             // model.scale.set(30,31,31)
+    //              this.scene.add(gltf.scene);
+    //              //this.group.add(gltf.scene);
+    //              //console.log(this.group);
+    //              //console.log(gltf.scene);
+
+    //          }, (e) => {
+    //              this.progressFn(e);
+    //          },
+    //          function (error) {
+    //              console.error(error);
+    //          });
+    // }
 
     createGUI(model, animations) {
         const states = ['Idle', 'Walking', 'Running', 'Dance'];
@@ -309,10 +329,12 @@ class Home3d {
             }
         }
     }
+    
     addMesh() {
         return new Promise((resolve, reject) => {
             this.initBuilding();
             this.initRobot();
+            //this.initGrass();
         })
 
     }

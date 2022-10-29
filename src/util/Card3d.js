@@ -175,7 +175,6 @@ class Card3d {
     addMesh() {
         return new Promise((resolve, reject) => {
             this.initGltf();
-            new Base3d(this.scene);
         })
     }
     addProgress() {

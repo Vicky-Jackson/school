@@ -5,7 +5,7 @@
       enablePan:false,
       enableZoom:false,
       enableRotate:false
-    }"></vue3dLoader>
+    }" :lights="lights"></vue3dLoader>
     
     </div>
     
@@ -13,6 +13,26 @@
 
 <script setup>
 import { vue3dLoader } from "vue-3d-loader"
+const lights = [
+    {
+        type: "AmbientLight",
+        color: "0xffffff",
+        position: { x: -1, y:1, z: 1 },
+        intensity: 0.5,
+    },
+    {
+        type: "DirectionalLight",
+        position: { x: 0, y: 0, z: 1 },
+        color: "0xffffff",
+        intensity: 1,
+    },
+    {
+        type: "DirectionalLight",
+        position: { x: 0, y: 0, z: -1 },
+        color: "0xffffff",
+        intensity: 0.5,
+    },
+];
 </script>
 
 <style lang="less" scoped>

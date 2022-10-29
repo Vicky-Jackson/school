@@ -12,6 +12,7 @@ import Students from "../views/message.vue";
 import Timetable from "../views/timetable.vue";
 import Test from "../views/test.vue";
 import Card from "../views/detail.vue";
+import Library from "../views/library.vue";
 const routes = [{
         path: "/",
         name: "home",
@@ -51,6 +52,11 @@ const routes = [{
         path: "/card",
         name: "card",
         component: Card
+    },
+    {
+        path: "/library",
+        name: "library",
+        component: Library
     },
 ];
 
