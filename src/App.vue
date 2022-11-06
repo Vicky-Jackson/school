@@ -6,7 +6,7 @@ import {RouterView} from 'vue-router'
 <template>
     <Icon icon="icon-park:double-left" />
     <Icon icon="icon-park:double-right" />
-    <base3d id="base"></base3d>
+    <!-- <base3d id="base"></base3d> -->
     <router-view></router-view>
 </template>
 

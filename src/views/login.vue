@@ -74,7 +74,7 @@ const query = ()=>{
             }
         })
         .catch((error) => {
-            console.log(error);
+            alert("y用户名或密码错误！");
         });
 }
 </script>

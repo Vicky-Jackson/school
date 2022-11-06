@@ -94,10 +94,10 @@ class Library3d {
         this.camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
-            1,
+            0.1,
             100
         );
-        this.camera.position.set(20, -5, 0);
+        this.camera.position.set(25, -3,-8);
 
     }
     initRenderer() {
@@ -119,7 +119,7 @@ class Library3d {
     render() {
          var delta = this.clock.getDelta();
          this.mixer && this.mixer.update(delta);
-         this.moveOnCurve();
+         //this.moveOnCurve();
          this.renderer.render(this.scene, this.camera);
     }
     animate() {
@@ -191,7 +191,7 @@ class Library3d {
          loader.setDRACOLoader(this.dracoLoader);
          loader.load("./texture/eye/scene.gltf", (gltf) => {
             let model = gltf.scene;
-            model.position.set(15,-2,-4);
+            model.position.set(15,0,-10);
             model.scale.set(3,3,3)
             this.model = model;
              this.scene.add(model);
@@ -203,13 +203,14 @@ class Library3d {
     makeCurve() {
         //Create a closed wavey loop
         this.curve = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(15, -2, -4),
-            new THREE.Vector3(15, -5, -4),
-            new THREE.Vector3(8, -5, -4),
+            new THREE.Vector3(15, 0, -10),
+            new THREE.Vector3(15, -5, -10),
+            new THREE.Vector3(-15, -5, -10),
+         
         ]);
         this.curve.curveType = "catmullrom";
         //this.curve.closed = true; //设置是否闭环
-        this.curve.tension = 0.5; //设置线的张力，0为无弧度折线
+        this.curve.tension = 0.2; //设置线的张力，0为无弧度折线
 
         // 为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
         const points = this.curve.getPoints(3000);
@@ -242,11 +243,19 @@ class Library3d {
             if (point && point.x) {
                 if (this.model) {
                     this.model.position.set(point1.x, point1.y, point1.z);
-                    this.model.lookAt(point.x, point.y, point.z);
+                    //this.model.lookAt(point.x, point.y, point.z);
+                    //console.log(point1.y);
 
                 }
-                this.camera.position.set(point.x, point.y, point.z);
-                this.camera.lookAt(point1.x, point1.y, point1.z);
+                if(point1.y<=-5){
+                    this.camera.position.set(point.x, -5, point.z);
+                    this.camera.lookAt(point1.x, -5, point1.z);
+                }
+                else{
+                    this.camera.position.set(point.x, point.y, point.z);
+                    this.camera.lookAt(10, point.y, point1.z);
+                }
+               
                 var targetPos = point //目标位置点
                 var offsetAngle = 0 //目标移动时的朝向偏移
 
