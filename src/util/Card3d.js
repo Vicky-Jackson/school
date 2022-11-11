@@ -16,9 +16,12 @@ import {
 import {
     gsap
 } from "gsap";
+import {
+    xml
+} from "d3";
 
 class Card3d {
-    constructor(selector, onFinish) {
+    constructor(selector, msg) {
         this.container = document.querySelector(selector);
         this.camera;
         this.group;
@@ -27,10 +30,11 @@ class Card3d {
         this.dracoLoader;
         this.renderer;
         this.model;
+        this.message = msg;
         this.selectObject;
         this.animateAction;
         this.clock = new THREE.Clock();
-        this.onFinish = onFinish;
+
         this.init();
         this.animate();
         this.progressFn;
@@ -91,7 +95,7 @@ class Card3d {
             1,
             100
         );
-        this.camera.position.set(5,0,2);
+        this.camera.position.set(5, 0, 2);
 
     }
     initRenderer() {
@@ -120,7 +124,7 @@ class Card3d {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
     }
-    initSprite() {
+    initSprite(text) {
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
         //canvas 实体
@@ -128,9 +132,9 @@ class Card3d {
         context.fillRect(0, 0, 140, 50); //x,y,width,height
 
         //canvas 文字
-        context.fillStyle = "black";
+        context.fillStyle = "red";
         context.font = "24px bold Arial";
-        context.fillText("Math", 30, 30);
+        context.fillText(text, 30, 30);
 
         //生成图片
         let url = canvas.toDataURL('image/png');
@@ -163,14 +167,63 @@ class Card3d {
             //this.group = new THREE.Group();
 
             //console.log(gltf.scene);
-          
-         
-            //console.log(mesh)
+
+            let meshs = this.addMessage();
+            console.log(meshs);
+            for(let scene of meshs){
+                let mesh = scene.scene;
+                mesh.position.set(scene.position.x, scene.position.y, scene.position.z);
+                mesh.rotation.set(0, Math.PI / 2, 0);
+                mesh.scale.set(0.5, 0.5, 0.5);
+                gltf.scene.add(mesh);
+            }
+            console.log(gltf.scene);
             this.scene.add(gltf.scene);
 
         }, (e) => {
 
         });
+    }
+    addMessage() {
+        let vectors = [{
+                x: 0.05,
+                y: 1.15,
+                z: -0.2
+            },
+            {
+                x: 0.05,
+                y: 0.95,
+                z: -0.35
+            },
+            {
+                x: 0.05,
+                y: 0.75,
+                z: -0.35
+            },
+            {
+                x: 0.05,
+                y: 0.5,
+                z: -0.35
+            },
+        ]
+        let positions = [];
+        for(let vector of vectors ){
+            positions.push(new THREE.Vector3(vector.x,vector.y,vector.z));
+        }
+        let detail = [this.message.s_id, this.message.email, this.message.phone];
+        let name = this.message.s_name;
+        let sex = this.message.sex;
+        let classWord = "高三一班"
+        let details = [this.message.s_id, this.message.email, this.message.phone,classWord];
+        let mesh = [];
+        let num = 0;
+        for(let detail of details){
+            mesh.push({
+                scene:this.initSprite(detail),
+                position:positions[num++],
+            });
+        }
+        return mesh;
     }
     addMesh() {
         return new Promise((resolve, reject) => {

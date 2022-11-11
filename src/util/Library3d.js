@@ -16,6 +16,10 @@ import {
 import {
     gsap
 } from "gsap";
+import {
+    GUI
+}
+from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
 class Library3d {
     constructor(selector, onFinish) {
@@ -32,6 +36,7 @@ class Library3d {
          this.renderer;
          this.time = 0;
          this.model;
+         this.move = false;
          this.selectObject;
          this.animateAction;
          this.progress = 0;
@@ -119,7 +124,8 @@ class Library3d {
     render() {
          var delta = this.clock.getDelta();
          this.mixer && this.mixer.update(delta);
-         //this.moveOnCurve();
+        if (this.move == true)
+            this.moveOnCurve();
          this.renderer.render(this.scene, this.camera);
     }
     animate() {
@@ -176,6 +182,8 @@ class Library3d {
             let mesh = this.initSprite();
             mesh.position.set(16,0,0);
             model.add(mesh);
+
+            
             //console.log(gltf.scene);
 
 
@@ -194,11 +202,26 @@ class Library3d {
             model.position.set(15,0,-10);
             model.scale.set(3,3,3)
             this.model = model;
-             this.scene.add(model);
+            this.createGUI(gltf.scene);
+            this.scene.add(model);
 
          }, (e) => {
 
          });
+    }
+    createGUI(model) {
+        this.gui = new GUI();
+        const moveFolder = this.gui.addFolder('move');
+        let params = {
+            开始漫游: () => {
+                this.move = true;
+            },
+            结束漫游: () => {
+                this.move = false;
+            }
+        }
+        moveFolder.add(params, "开始漫游");
+        moveFolder.add(params, "结束漫游");
     }
     makeCurve() {
         //Create a closed wavey loop
@@ -245,7 +268,6 @@ class Library3d {
                     this.model.position.set(point1.x, point1.y, point1.z);
                     //this.model.lookAt(point.x, point.y, point.z);
                     //console.log(point1.y);
-
                 }
                 if(point1.y<=-5){
                     this.camera.position.set(point.x, -5, point.z);

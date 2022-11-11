@@ -41,13 +41,7 @@ const data = reactive({
     }
 })
 const router = useRouter();
-const handleLogin = () => {
-    store.commit('setUserInfo', data.loginData)
-    //跳转到  /index  页面
-    router.push({
-        path: '/index'
-    })
-}
+
 function loadingFinish(){
     data.isLoading=false;
 }

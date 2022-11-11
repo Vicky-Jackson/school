@@ -33,6 +33,7 @@ class Home3d {
         this.selectObject;
         this.animateAction;
         this.progress = 0;
+        this.move = false;
         this.clock = new THREE.Clock();
         this.onFinish = onFinish;
         this.init();
@@ -67,7 +68,7 @@ class Home3d {
         });
 
         //监听鼠标点击事件
-        //window.addEventListener("click", this.onMouseClick.bind(this))
+        window.addEventListener("click", this.onMouseClick.bind(this))
     }
     initScene() {
         this.scene = new THREE.Scene();
@@ -105,7 +106,8 @@ class Home3d {
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
-        //this.moveOnCurve();
+        if(this.move == true)
+            this.moveOnCurve();
         this.renderer.render(this.scene, this.camera);
     }
     animate() {
@@ -117,7 +119,7 @@ class Home3d {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
     }
-    initSprite() {
+    initSprite(text) {
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
         //canvas 实体
@@ -133,7 +135,7 @@ class Home3d {
         //canvas 文字
         context.fillStyle = "#fff";
         context.font = "24px bold Arial";
-        context.fillText("教学楼", 30, 30);
+        context.fillText(text, 30, 30);
 
         var texture = new THREE.Texture(canvas);
         texture.needsUpdate = true;
@@ -142,7 +144,7 @@ class Home3d {
         });
         var mesh = new THREE.Sprite(material);
         /*4、放大图片，每个精灵有自己的大小，默认情况下都是很小的，如果你不放大，基本是看不到的*/
-        mesh.scale.set(20, 20, 1);
+       
 
         return mesh;
     }
@@ -156,10 +158,20 @@ class Home3d {
             //this.group = new THREE.Group();
 
             //console.log(gltf.scene);
-            var mesh = this.initSprite();
+            var mesh = this.initSprite("教学楼");
             mesh.position.set(80, 25, -320);
-            //console.log(mesh)
+             mesh.scale.set(20, 20, 1);
+            console.log(mesh)
+            mesh.name = "teach";
             model.add(mesh);
+            
+            var mesh1 = this.initSprite("图书馆");
+            mesh1.position.set(65, 19, -260);
+            //console.log(mesh)
+             mesh1.scale.set(14, 14, 1);
+             mesh1.name = "library";
+            model.add(mesh1);
+
             this.scene.add(gltf.scene);
             //this.group.add(gltf.scene);
 
@@ -226,6 +238,18 @@ class Home3d {
         }
 
         const statesFolder = this.gui.addFolder('States');
+        const moveFolder = this.gui.addFolder('move');
+        let params = {
+            开始漫游: () => {
+                this.move = true;
+            },
+            结束漫游:() => {
+                this.move = false;
+            }
+        }
+        moveFolder.add(params,"开始漫游");
+        moveFolder.add(params, "结束漫游");
+
         const api = {
             state: 'Running'
         };
@@ -373,7 +397,25 @@ class Home3d {
         this.camera.fov = fov;
         this.camera.updateProjectionMatrix();
     }
+    onMouseClick(event){
+        var mouse = new THREE.Vector2();
+        var raycaster = new THREE.Raycaster();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
+        raycaster.setFromCamera(mouse, this.camera);
+        const intersects = raycaster.intersectObjects(this.scene.children);
+        for(let intersect of intersects){
+            if(intersect.object.name == "teach"){
+                document.getElementById("teach").show();
+                break;
+            }
+            if (intersect.object.name == "library") {
+                document.getElementById("library").show();
+                break;
+            }
+        }
+    }
 
 }
 

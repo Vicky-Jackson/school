@@ -5,9 +5,6 @@
             </card>
         </div>
     </div>
-
-
-
 </template>
 
 <script setup>
@@ -22,7 +19,6 @@ axios
 .get('/api/user/getStudents', {})
 .then((res) => { 
     data.message = res.data;
-    console.log(data.message)
     });
 </script>
 

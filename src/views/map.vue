@@ -1,27 +1,33 @@
 <template>
     <div>
-        <baidu-map class="map" v="3.0" type="API" :center="{lng: 116.404, lat: 39.915}" :zoom="15" ak="zXPdMGMbCX7lBKWXsxhzoU3iQ03ZdieV">
-
+        <baidu-map class="map" v="3.0" type="API" center="漳州市" :zoom="15" ak="zXPdMGMbCX7lBKWXsxhzoU3iQ03ZdieV">
         </baidu-map>
     </div>
+    <el-button type="primary" @click="clickAddress">
+        签到
+    </el-button>
 </template>
 
 <script setup>
 import axios from "axios"
 import {BaiduMap} from 'vue-baidu-map-3x'
-axios
-    .get("/baidu/location/ip", {
-        params: {
-            ak: 'grEV7ojtYO5DR5ekD9sLD9bLWpCGU5Ej',
-            coor: "bd09ll"
-        }
-    })
-    .then(res => {
-        console.log(res);
-    })
-    .catch(err => {
-        console.log(err);
-    });
+
+const clickAddress = ()=>{
+    axios
+        .get("/baidu/location/ip", {
+            params: {
+                ak: 'grEV7ojtYO5DR5ekD9sLD9bLWpCGU5Ej',
+                coor: "bd09ll"
+            }
+        })
+        .then(res => {
+            alert(res.data.content.address);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
 </script>
 
 <style lang="less" scoped>
