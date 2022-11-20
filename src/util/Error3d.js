@@ -17,7 +17,7 @@ import {
     gsap
 } from "gsap";
 
-class Base3d {
+class Error3d {
     constructor(selector, onFinish) {
         this.container = document.querySelector(selector);
         this.camera;
@@ -74,22 +74,22 @@ class Base3d {
         this.scene.add(new THREE.AmbientLight(0x999999));
     }
     initLight() {
-        // let light = new THREE.DirectionalLight(0xffffff, 1);
-        // light.position.set(0, 0, 1);
-        // this.scene.add(light);
-        // let light2 = new THREE.DirectionalLight(0xffffff, 0.5);
-        // light2.position.set(0, 0, -1);
-        // this.scene.add(light2);
-        // let light3 = new THREE.AmbientLight(0xffffff, 0.5);
-        // light3.position.set(-1, 1, 1);
-        // this.scene.add(light3);
+        let light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(0, 0, 1);
+        this.scene.add(light);
+        let light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        light2.position.set(0, 0, -1);
+        this.scene.add(light2);
+        let light3 = new THREE.AmbientLight(0xffffff, 0.5);
+        light3.position.set(-1, 1, 1);
+        this.scene.add(light3);
     }
     initCamera() {
         this.camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
             1,
-            100
+            10000
         );
         this.camera.position.set(5, 0, 2);
 
@@ -97,13 +97,14 @@ class Base3d {
     initRenderer() {
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
-            alpha:true
         });
         //屏幕像素比
         this.renderer.setPixelRatio(window.devicePixelRatio);
         //渲染的尺寸大小
-        this.renderer.setSize(500, 500);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         //色调映射
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default 
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 3;
         this.container.appendChild(this.renderer.domElement);
@@ -121,31 +122,6 @@ class Base3d {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
     }
-    // initSprite() {
-    //     var canvas = document.createElement('canvas');
-    //     var context = canvas.getContext('2d');
-    //     //canvas 实体
-    //     context.fillStyle = "rgba(0,0,0,0)"; //填充带透明颜色
-    //     context.fillRect(0, 0, 140, 50); //x,y,width,height
-
-    //     //canvas 文字
-    //     context.fillStyle = "black";
-    //     context.font = "24px bold Arial";
-    //     context.fillText("Math", 30, 30);
-
-    //     //生成图片
-    //     let url = canvas.toDataURL('image/png');
-    //     //将图片构建到纹理中
-    //     let geometry1 = new THREE.PlaneGeometry(3, 3)
-    //     let material1 = new THREE.MeshBasicMaterial({
-    //         map: new THREE.TextureLoader().load(url),
-    //         side: THREE.DoubleSide,
-    //         opacity: 1,
-    //         transparent: true,
-    //     })
-    //     let rect = new THREE.Mesh(geometry1, material1)
-    //     return rect;
-    // }
     initDraco() {
         this.dracoLoader = new DRACOLoader();
         this.dracoLoader.setDecoderPath("./draco/gltf/");
@@ -156,13 +132,14 @@ class Base3d {
     initGltf() {
         let loader = new GLTFLoader();
         loader.setDRACOLoader(this.dracoLoader);
-        loader.load("./texture/animal/scene.gltf", (gltf) => {
-            console.log(gltf.scene);
-            gltf.scene.scale.set(0.3,0.15,0.3);
-            gltf.scene.position.set(0, -0.5, 0);
-            gltf.scene.rotation.set(0, Math.PI-Math.PI/3, 0)
-            this.scene.add(gltf.scene);
-
+        loader.load("./texture/error404/scene.gltf", (gltf) => {
+            gltf.scene.rotation.set(0, 3*Math.PI / 8, 0)
+            var box = new THREE.Box3().setFromObject(gltf.scene);
+            let model = gltf.scene;
+            box.getCenter(gltf.scene.position);
+            gltf.scene.position.multiplyScalar(-1);
+            
+            this.scene.add(gltf.scene)
         }, (e) => {
 
         });
@@ -207,4 +184,4 @@ class Base3d {
         this.camera.updateProjectionMatrix();
     }
 }
-export default Base3d;
+export default Error3d;

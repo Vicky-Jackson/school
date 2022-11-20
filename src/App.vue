@@ -1,12 +1,10 @@
 <script setup>
 import {RouterView} from 'vue-router'
-
+import Base3d from './components/base3d.vue'
 </script>
 
 <template>
-    <Icon icon="icon-park:double-left"/>
-    <Icon icon="icon-park:double-right" />
-    <!-- <base3d id="base"></base3d> -->
+    <Base3d></Base3d>
     <router-view></router-view>
 </template>
 

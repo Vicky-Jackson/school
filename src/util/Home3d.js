@@ -84,7 +84,7 @@ class Home3d {
             0.1,
             1000
         );
-        this.camera.position.set(-1.8, 0.6, 2.7);
+        this.camera.position.set(20, 0, 30);
 
     }
     initRenderer() {
@@ -158,19 +158,19 @@ class Home3d {
             //this.group = new THREE.Group();
 
             //console.log(gltf.scene);
-            var mesh = this.initSprite("教学楼");
-            mesh.position.set(80, 25, -320);
-             mesh.scale.set(20, 20, 1);
-            console.log(mesh)
-            mesh.name = "teach";
-            model.add(mesh);
+            // var mesh = this.initSprite("教学楼");
+            // mesh.position.set(80, 25, -320);
+            //  mesh.scale.set(20, 20, 1);
+            // console.log(mesh)
+            // mesh.name = "teach";
+            // model.add(mesh);
             
-            var mesh1 = this.initSprite("图书馆");
-            mesh1.position.set(65, 19, -260);
-            //console.log(mesh)
-             mesh1.scale.set(14, 14, 1);
-             mesh1.name = "library";
-            model.add(mesh1);
+            // var mesh1 = this.initSprite("图书馆");
+            // mesh1.position.set(65, 19, -260);
+            // //console.log(mesh)
+            //  mesh1.scale.set(14, 14, 1);
+            //  mesh1.name = "library";
+            // model.add(mesh1);
 
             this.scene.add(gltf.scene);
             //this.group.add(gltf.scene);
@@ -305,15 +305,15 @@ class Home3d {
         this.curve.tension = 0.5; //设置线的张力，0为无弧度折线
 
         // 为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
-        const points = this.curve.getPoints(3000);
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({
-            color: 0x000000
-        });
+        // const points = this.curve.getPoints(3000);
+        // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        // const material = new THREE.LineBasicMaterial({
+        //     color: 0x000000
+        // });
 
-        // Create the final object to add to the scene
-        const curveObject = new THREE.Line(geometry, material);
-        this.scene.add(curveObject)
+        // // Create the final object to add to the scene
+        // const curveObject = new THREE.Line(geometry, material);
+        // this.scene.add(curveObject)
     }
     moveOnCurve() {
         if (this.curve == null || this.model == null) {

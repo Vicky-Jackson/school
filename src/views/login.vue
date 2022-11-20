@@ -11,7 +11,7 @@
                     <el-input v-model="data.loginData.username"></el-input>
                 </el-form-item>
                 <el-form-item label="密码">
-                    <el-input type="password" v-model="data.loginData.pass" show-password></el-input>
+                    <el-input type="password" v-model="data.loginData.password" show-password></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="query">登录</el-button>
@@ -37,7 +37,7 @@ const data = reactive({
     progress:0,
     loginData:{
         username:'',
-        pass:''
+        password:'',
     }
 })
 const router = useRouter();
@@ -55,20 +55,28 @@ onMounted(() => {
 })
 const query = ()=>{
     axios
-        .post("/api/user/getUser", data.loginData, {})
+        .get("/api/user/getUser", 
+        {params:{
+            username: data.loginData.username,
+            password: data.loginData.password
+        }})
         .then((res) => {
-            if (res.status == 200) {
-                store.commit('setUserInfo', data.loginData)
-                sessionStorage.setItem('loginData', JSON.stringify(data.loginData))
-
+            if (res.data.length > 0) {
+                
+                store.commit('setUserInfo', res.data[0])
+                sessionStorage.setItem('loginData', JSON.stringify(res.data[0]))
                 //跳转到  /index  页面
+                console.log(store.state.userInfo.username);
                 router.push({
                     path: '/'
                 })
             }
+            else{
+                alert("用户名或密码错误！");
+            }
         })
         .catch((error) => {
-            alert("y用户名或密码错误！");
+            alert(error);
         });
 }
 </script>

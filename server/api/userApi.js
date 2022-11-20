@@ -45,12 +45,12 @@ var jsonWrite = (res, ret) => {
 // });
 // module.exports = router;
 
-router.post('/getUser', (req, res) => {
+router.get('/getUser', (req, res) => {
     let sql = $sql.user.getUser;
-    let params = req.body;
+    let params = req.query;
     console.log(params);
 
-    conn.query(sql, [params.username,params.password], (err, result) => {
+    conn.query(sql, [params.username, params.password], (err, result) => {
         if (err) {
             console.log(err);
         }

@@ -3,7 +3,8 @@ import { createStore } from "vuex";
 const store = createStore({
     state:{
          userInfo: (sessionStorage.getItem('loginData') && JSON.parse(sessionStorage.getItem('loginData'))) || {},
-         message:{}
+         message:{},
+         constRoutes: sessionStorage.getItem('routes') || [],
     },
     mutations:{
         setUserInfo(state, uInfo) {
@@ -11,6 +12,9 @@ const store = createStore({
         },
         setMessage(state,msg){
             state.message = msg
+        },
+        setRoutes(state, constRoutes) {
+            state.constRoutes = constRoutes
         }
     },
     actions:{},

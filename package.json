@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "baidumap": "^0.0.4",
     "d3": "^7.6.1",
     "echarts": "^5.4.0",
     "element-plus": "^2.2.17",
