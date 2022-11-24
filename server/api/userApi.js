@@ -74,4 +74,20 @@ router.get('/getStudents', (req, res) => {
         }
     });
 });
+
+router.get('/getTeachers', (req, res) => {
+    let sql = $sql.user.getTeachers;
+    let params = req.body;
+    console.log(params);
+
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
 module.exports = router;

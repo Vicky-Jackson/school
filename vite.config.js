@@ -8,10 +8,17 @@ import {
   ElementPlusResolver
 } from 'unplugin-vue-components/resolvers'
 // https://vitejs.dev/config/
+
+const fs = require('fs')
+const path = require('path')
 export default defineConfig({
    server: {
      host: "0.0.0.0",
-
+    // https:true,
+     https: {
+       cert: fs.readFileSync(path.join(__dirname, 'key/cert.crt')),
+       key: fs.readFileSync(path.join(__dirname, 'key/cert.key')),
+     },
       proxy: {
         '/api': {
           target: 'http://127.0.0.1:8888/api',

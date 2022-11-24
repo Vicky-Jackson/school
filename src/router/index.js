@@ -24,12 +24,12 @@ const routes = [{
 
     },
     {
-        path: "/map",
-        name: "map",
-        component: () => import("../views/map.vue"),
-         meta: {
-             role: ['admin']
-         }
+        path: "/sign",
+        name: "sign",
+        component: () => import("../views/sign.vue"),
+        meta: {
+            role: ['admin']
+        }
 
     },
     {
@@ -58,12 +58,31 @@ const routes = [{
 
     },
     {
+        path: "/photo",
+        name: "photo",
+        component: () => import("../views/photo.vue"),
+
+    },
+    {
         path: "/test",
         name: "test",
         component: () => import("../views/test.vue"),
         meta: {
-            role: ['student']
+            role: ['student','admin']
         }
+    },
+    {
+        path: "/signin",
+        name: "signin",
+        component: () => import("../views/signIn.vue"),
+        meta: {
+            role: ['teacher', 'admin']
+        }
+    }, 
+    {
+        path: "/work",
+        name: "work",
+        component: () => import("../views/work.vue"),
     },
     {
         path: "/404",
@@ -82,6 +101,7 @@ router.beforeEach((to, from, next) => {
     // from: 到哪个页面
     // next: 只有执行next()页面
     //判断用户是否登录
+    
     if (!store.state.userInfo.username) {
         // 未登录，跳转到login页面
         if (to.path === '/login') {
@@ -92,16 +112,15 @@ router.beforeEach((to, from, next) => {
     } else {
         // 已登录
         const role = store.state.userInfo.role;
-        const constRoutes = routes.filter(item =>{
+        const constRoutes = routes.filter(item => {
             return item.meta?.role?.includes(role) || !item.meta || !item.meta?.role;
         })
-        store.commit('setRoutes',constRoutes);
-        sessionStorage.setItem('routes',constRoutes);
+        store.commit('setRoutes', constRoutes);
+        sessionStorage.setItem('routes', constRoutes);
         console.log(store.state.constRoutes)
         if ((to.meta.role && to.meta.role.includes(role)) || !to.meta.role) {
             next();
-        }
-        else{
+        } else {
             next('/404')
         }
     }

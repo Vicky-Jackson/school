@@ -5,6 +5,8 @@ const store = createStore({
          userInfo: (sessionStorage.getItem('loginData') && JSON.parse(sessionStorage.getItem('loginData'))) || {},
          message:{},
          constRoutes: sessionStorage.getItem('routes') || [],
+         sign:[],
+         work:[]
     },
     mutations:{
         setUserInfo(state, uInfo) {
