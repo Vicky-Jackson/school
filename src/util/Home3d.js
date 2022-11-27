@@ -14,6 +14,7 @@ import {
     GUI
 }
 from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { TOOLTIP_INJECTION_KEY } from "element-plus";
 
 class Home3d {
     constructor(selector, onFinish) {
@@ -73,18 +74,20 @@ class Home3d {
     initScene() {
         this.scene = new THREE.Scene();
         // this.scene.setEnvMap('000');
-        this.scene.background = new THREE.Color("#D2B48C");
+        //this.scene.background = new THREE.Color("#D2B48C");
         this.scene.add(new THREE.AmbientLight(0x999999));
+        this.scene.rotation.set(0,-Math.PI/4,0);
+        this.scene.position.set(10, -80, -40)
         
     }
     initCamera() {
         this.camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
-            0.1,
+            1,
             1000
         );
-        this.camera.position.set(20, 0, 30);
+        this.camera.position.set(0, 80, 100);
 
     }
     initRenderer() {
@@ -157,20 +160,20 @@ class Home3d {
             gltf.scene.position.multiplyScalar(-1);
             //this.group = new THREE.Group();
 
-            //console.log(gltf.scene);
-            // var mesh = this.initSprite("教学楼");
-            // mesh.position.set(80, 25, -320);
-            //  mesh.scale.set(20, 20, 1);
-            // console.log(mesh)
-            // mesh.name = "teach";
-            // model.add(mesh);
+            console.log(gltf.scene);
+            var mesh = this.initSprite("教学楼");
+            mesh.position.set(90, 60, -310);
+             mesh.scale.set(30, 30, 1);
+            console.log(mesh)
+            mesh.name = "teach";
+            model.add(mesh);
             
-            // var mesh1 = this.initSprite("图书馆");
-            // mesh1.position.set(65, 19, -260);
-            // //console.log(mesh)
-            //  mesh1.scale.set(14, 14, 1);
-            //  mesh1.name = "library";
-            // model.add(mesh1);
+            var mesh1 = this.initSprite("图书馆");
+            mesh1.position.set(65, 19, -260);
+            //console.log(mesh)
+             mesh1.scale.set(30, 30, 1);
+             mesh1.name = "library";
+            model.add(mesh1);
 
             this.scene.add(gltf.scene);
             //this.group.add(gltf.scene);
@@ -226,6 +229,7 @@ class Home3d {
         const states = ['Idle', 'Walking', 'Running', 'Dance'];
 
         this.gui = new GUI();
+        this.gui.close();
 
         this.mixer = new THREE.AnimationMixer(model);
 
@@ -261,7 +265,7 @@ class Home3d {
 
         });
 
-        statesFolder.open();
+        //statesFolder.open();
 
         this.activeAction = this.actions['Running'];
         //console.log(this.activeAction);

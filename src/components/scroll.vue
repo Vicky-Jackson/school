@@ -1,9 +1,9 @@
 <template>
-    <vue3-seamless-scroll :list="data.listData" class="warp">
+    <vue3-seamless-scroll v-model="value" :list="data.listData" class="warp" step="1">
         <ul class="item">
             <li v-for="(item, index) in data.listData" :key="index">
-                <span class="title">{{item.title}}</span>
-                <span class="date">{{item.date}}</span>
+                <span class="title">{{ item.title }}</span>
+                <span class="date">{{ item.date }}</span>
             </li>
         </ul>
     </vue3-seamless-scroll>
@@ -12,6 +12,8 @@
 <script setup>
 import { Vue3SeamlessScroll } from "vue3-seamless-scroll"
 import { onMounted, ref, reactive } from 'vue'
+
+const value=ref(true);
 
 const data = reactive({
     listData: [{
@@ -47,18 +49,17 @@ const data = reactive({
 
 <style lang="less" scoped>
 .warp {
-    height: 270px;
+    height: 260px;
     width: 360px;
     margin: 0 auto;
     overflow: hidden;
-
     ul {
         list-style: none;
         padding: 0;
         margin: 0 auto;
-
         li,
         a {
+            color: white;
             display: block;
             height: 30px;
             line-height: 30px;

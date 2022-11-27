@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-popover placement="bottom" :width="200" trigger="click" offset="-150"
-            content="this is content, this is content, this is content">
+            content="有什么可以帮到您？">
             <template #reference>
                 <div id="base">
                 </div>

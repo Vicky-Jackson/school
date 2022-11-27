@@ -65,7 +65,7 @@ router.get('/getStudents', (req, res) => {
     let params = req.body;
     console.log(params);
 
-    conn.query(sql,(err, result) => {
+    conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -77,6 +77,128 @@ router.get('/getStudents', (req, res) => {
 
 router.get('/getTeachers', (req, res) => {
     let sql = $sql.user.getTeachers;
+    let params = req.body;
+    console.log(params);
+
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/createSign', (req, res) => {
+    let params = req.body;
+    console.log(params);
+    let sql = 'create table ' + params.name +
+        '(id int  auto_increment not null primary key,s_id varchar(255) not null,time datetime not null,address varchar(255),photo longtext)';
+    sql.replace(/[\\"']/g, "");
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addSign', (req, res) => {
+    var sql = $sql.user.addSign;
+    var params = req.body;
+    console.log(params);
+    // ! [params.username, params.age] 自动填充到之前 ？ 里面
+    conn.query(sql, [params.type, params.t_id, params.startTime, params.endTime, params.number, params.tableName], (err, result) => {
+        if (err)
+            console.log(err);
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addSignin', (req, res) => {
+    var params = req.body;
+    console.log(params);
+    var sql = ("insert into" + params.tableName).replace(/[\\"']/g, "")+'(s_id,time,address,photo) values(?,?,?,?)';
+    
+    // ! [params.username, params.age] 自动填充到之前 ？ 里面
+    conn.query(sql, [params.s_id, params.time, params.address, params.photo], (err, result) => {
+        if (err)
+            console.log(err);
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getSignin', (req, res) => {
+    var params = req.body;
+    console.log(params);
+    var sql = ("select *" + params.tableName).replace(/[\\"']/g, "") + 'where s_id = ?';
+
+    // ! [params.username, params.age] 自动填充到之前 ？ 里面
+    conn.query(sql, [paramsid], (err, result) => {
+        if (err)
+            console.log(err);
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getSign', (req, res) => {
+    let sql = $sql.user.getSign;
+    let params = req.body;
+    console.log(params);
+
+    conn.query(sql, [params.id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getSignin', (req, res) => {
+    let sql = $sql.user.getSignin;
+    let params = req.body;
+    console.log(params);
+
+    conn.query(sql, [params.id],(err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/createWork', (req, res) => {
+    let params = req.body;
+    console.log(params);
+    let sql = 'create table ' + params.name + 
+    '(id int  auto_increment not null primary key,s_id varchar(255) not null,time datetime not null,detail longtext)';
+    sql.replace(/[\\"']/g, "");
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+
+router.get('/getAnouncement', (req, res) => {
+    let sql = $sql.user.getAnouncement;
     let params = req.body;
     console.log(params);
 

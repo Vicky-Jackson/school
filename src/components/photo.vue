@@ -11,8 +11,6 @@
         <div>
             <el-button @click="setImage" type="success" v-if="data.dialogFormVisible == true">拍照
             </el-button>
-            <el-button  type="success" v-if="data.dialogFormVisible == true">签到
-            </el-button>
         </div>
 
     </div>
@@ -21,6 +19,9 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
 import { CameraFilled } from '@element-plus/icons-vue'
+
+const emit = defineEmits(['on-photo'])
+
 const data = reactive({
     videoWidth: 200,
     videoHeight: 200,
@@ -104,19 +105,19 @@ const setImage = () => {
     // 获取图片base64链接
     var image = data.thisCancas.toDataURL("image/png");
     data.imgSrc = image; //赋值并预览图片
-    console.log(image);
+    emit('on-photo',image);
 }
-const dataURLtoFile = (dataurl, filename) =>{
-    var arr = dataurl.split(",");
-    var mime = arr[0].match(/:(.*?);/)[1];
-    var bstr = atob(arr[1]);
-    var n = bstr.length;
-    var u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-}
+// const dataURLtoFile = (dataurl, filename) =>{
+//     var arr = dataurl.split(",");
+//     var mime = arr[0].match(/:(.*?);/)[1];
+//     var bstr = atob(arr[1]);
+//     var n = bstr.length;
+//     var u8arr = new Uint8Array(n);
+//     while (n--) {
+//         u8arr[n] = bstr.charCodeAt(n);
+//     }
+//     return new File([u8arr], filename, { type: mime });
+// }
 </script>
 
 <style lang="less" scoped>

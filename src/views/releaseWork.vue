@@ -14,7 +14,6 @@
                 </el-form>
             </div>
             <div>
-
             </div>
 
             <template #footer>
@@ -26,8 +25,13 @@
                 </span>
             </template>
         </el-dialog>
-        <div>
-
+        <div id="card" v-for="o in 2" :key="o">
+            <el-card shadow="hover">
+                <span>11.25验证码签到</span>
+                <div id="time">
+                    <span id="time-child">2022.11.25 12:00:00-2022.11.25 12:03:00</span>
+                </div>
+            </el-card>
         </div>
     </div>
 </template>
@@ -41,16 +45,28 @@ const radio = ref('验证码签到')
 const data = reactive({
     workMsg: '',
     msg: {},
-    value:''
+    value: ''
 })
 const defaultTime = new Date()
 
 const release = () => {
     dialogFormVisible.value = false;
-
+    
 }
 </script>
 
 <style lang="less" scoped>
+#card {
+    padding: 10px;
+    cursor: pointer;
+}
 
+#time {
+    float: right;
+
+    #time-child {
+        font-size: 12px;
+        color: #999;
+    }
+}
 </style>

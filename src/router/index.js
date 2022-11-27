@@ -28,7 +28,7 @@ const routes = [{
         name: "sign",
         component: () => import("../views/sign.vue"),
         meta: {
-            role: ['admin']
+            role: ['student', 'admin']
         }
 
     },

@@ -1,99 +1,169 @@
 <template>
-    <!-- <div>
-        <baidu-map class="map" v="3.0" type="API" center="漳州市" :zoom="15" ak="zXPdMGMbCX7lBKWXsxhzoU3iQ03ZdieV">
-        </baidu-map>
+    <div id="card" v-for="o in data.msg" :key="o">
+        <el-card shadow="hover" @click="clickSign(o)">
+            <span>{{ o.type }}-{{ o.t_id }}</span>
+            <div id="time">
+                <span id="time-child">{{ o.startTime }}-{{ o.endTime }}</span>
+            </div>
+        </el-card>
     </div>
-    <el-button type="primary" @click="clickAddress">
-        签到
-    </el-button> -->
-    <div id="container" class="bmap">
-    </div>
-    <el-button type="primary" @click="clickAddress">
-        签到
-    </el-button>
+    <el-dialog v-model="data.dialog[0]" title="签到">
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="data.dialog[0] = false">Cancel</el-button>
+                <el-button type="primary" @click="releaseSign">
+                    Confirm
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+
+    <el-dialog v-model="data.dialog[1]" title="位置签到">
+        <map @on-address="getAddress"></map>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="data.dialog[1] = false">Cancel</el-button>
+                <el-button type="primary" @click="releaseSign">
+                    Confirm
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+
+    <el-dialog v-model="data.dialog[2]" title="拍照签到">
+        <photo @on-photo="getPhoto"></photo>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="data.dialog[2] = false">Cancel</el-button>
+                <el-button type="primary" @click="releaseSign">
+                    Confirm
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+
+    <el-dialog v-model="data.dialog[3]" title="验证码签到">
+        <el-form label-width="100px" class="demo-ruleForm" :model="data">
+            <el-form-item label="请输入验证码">
+                <el-input v-model="data.pass"></el-input>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="data.dialog[3] = false">Cancel</el-button>
+                <el-button type="primary" @click="releaseSign">
+                    Confirm
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+   
 </template>
 
 <script setup>
 import axios from "axios"
 import { BaiduMap } from 'vue-baidu-map-3x'
-import { onMounted } from "vue";
+import { onMounted, ref, reactive } from "vue";
+import Photo from '../components/photo.vue'
+import Map from '../components/map.vue'
+import store from '../store/index'
+import { ElMessage } from 'element-plus'
 
 const data = reactive({
-    address:[]
+    address: '',
+    msg: [],
+    type: '',
+    pass: '',
+    image: '',
+    click: {},
+    dialog: [false, false, false, false, false]
 })
 
 onMounted(() => {
-    var map = new BMap.Map('container')
-    //var geolocation = new BMap.Geolocation()
-    const oldPoint = new BMap.Point(117.653591, 24.512634);//用所定位的经纬度查找所在地省市街道等信息
-    map.centerAndZoom(oldPoint, 15);
-    map.enableScrollWheelZoom(true);
-    // 开启SDK辅助定位
-    //geolocation.enableSDKLocation();
-    navigator.geolocation.getCurrentPosition((position) => {
-        let lat = position.coords.latitude;
-        let lng = position.coords.longitude;
-        const pointBak = new BMap.Point(lng, lat);
-        setTimeout(function () {
-            var convertor = new BMap.Convertor();
-            var pointArr = [];
-            pointArr.push(pointBak);
-            convertor.translate(pointArr, 1, 5, function (resPoint) {
-                if (resPoint && resPoint.points && resPoint.points.length > 0) {
-                    lng = resPoint.points[0].lng;
-                    lat = resPoint.points[0].lat-0.01;
+    axios
+        .get("/api/user/getSignin",
+            {
+                params: {
+                    id: store.state.userInfo.no,
                 }
-                const point = new BMap.Point(lng, lat);
-                const geo = new BMap.Geocoder();
-                geo.getLocation(point, (res) => {
-                    console.log(res)
-                });
             })
-        }, 1000);
-
-        // const convertor = new BMap.Convertor();
-        // convertor.translate([pointBak], 1, 5, function (resPoint) {
-        //     if (resPoint && resPoint.points && resPoint.points.length > 0) {
-        //         lng = resPoint.points[0].lng;
-        //         lat = resPoint.points[0].lat;
-        //     }
-        //     const point = new BMap.Point(lng, lat);
-        //     const geo = new BMap.Geocoder();
-        //     geo.getLocation(point, (res) => {
-        //         alert(res.address)
-        //     });
-        // });
-    });
-    // geolocation.getCurrentPosition(function (r) {
-    //     if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-    //         var mk = new BMap.Marker(r.point);
-    //         //  map.addOverlay(mk);//标出所在地
-    //         //  map.panTo(r.point);//地图中心移动
-    //         alert('您的位置：'+r.point.lng+','+r.point.lat);
-    //         var point = new BMap.Point(r.point.lng, r.point.lat);//用所定位的经纬度查找所在地省市街道等信息
-    //         map.centerAndZoom(point, 15);
-    //         var marker = new BMap.Marker(point);
-    //         map.addOverlay(marker); 
-    //         var gc = new BMap.Geocoder();
-    //         gc.getLocation(point, function (rs) {
-    //             var addComp = rs.addressComponents;
-    //             alert(rs.address);//地址信息
-    //         });
-    //     } else {
-    //         alert("failed" + this.getStatus());
-    //     }
-    // }, { enableHighAccuracy: true });
-
+        .then(res => {
+            if (res.data.length > 0) {
+                res.data.filter(item => {
+                    data.msg.push(item);
+                })
+            }
+        })
 })
-const clickAddress = ()=>{
-    
+const clickSign = (item) => {
+    data.click = item;
+    axios.get('/api/user/getSignin', {
+        params: {
+            tableName: item.tableName,
+            id: store.state.userInfo.no
+        }
+    }).then(res => {
+        if (res.data.length > 0) {
+            data.dialog[4] = true
+            ElMessage({
+                message: 'Congrats, this is a success message.',
+                type: 'success',
+            })
+        }
+    })
+    if (data.dialog[4] !== true) {
+        if (item.type == '普通签到') {
+            data.dialog[0] = true
+        }
+        else if (item.type == '位置签到') {
+            data.dialog[1] = true
+        }
+        else if (item.type == '拍照签到') {
+            data.dialog[2] = true
+        }
+        else if (item.type == '验证码签到') {
+            data.dialog[3] = true
+        }
+    }
+
 }
 
+const getAddress = (res) => {
+    data.address = res.address;
+}
+
+const getPhoto = (image) => {
+    data.image = image;
+}
+const releaseSign = () => {
+    data.dialog.filter(item => item = false);
+    const time = new Date();
+    const endTime = new Date(data.msg.endTime)
+    if (time > endTime) {
+        alert('不在有效时间！');
+        return;
+    }
+    const message = {
+        tableName: data.click.tableName,
+        s_id: data.click.s_id,
+        time: new Date(),
+        address: data.address,
+        photo: data.image
+    }
+    axios
+        .post("/api/user/addSignin", message)
+        .then(res => {
+            if (res.status === 200) {
+                alert('签到成功')
+            }
+        })
+
+}
 </script>
 
 <style lang="less" scoped>
-.bmap {
-    width: 100%;
-    height: 500px;
+#card {
+    padding: 10px;
+    cursor: pointer;
 }
 </style>

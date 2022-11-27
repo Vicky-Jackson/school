@@ -8,18 +8,20 @@ import {
 } from 'echarts/renderers'
 import {
     BarChart,
-    PieChart
+    PieChart,
+    LineChart,
 } from 'echarts/charts'
 import {
     GridComponent,
     TooltipComponent,
-    TitleComponent
+    TitleComponent,
 } from 'echarts/components'
 
 use([
     CanvasRenderer,
     BarChart,
     PieChart,
+    LineChart,
     GridComponent,
     TooltipComponent,
     TitleComponent

@@ -9,7 +9,6 @@
         <div style="margin-left:10px">
             <el-button type="primary" @click="commitWork" id="btn">提交作业</el-button>
         </div>
-        
     </div>
 </template>
 

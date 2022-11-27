@@ -7,9 +7,10 @@ import ECharts from 'vue-echarts'
 import './plugins/index'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+import vue3SeamlessScroll from 'vue3-seamless-scroll'
 
 const app = createApp(App);
-
+app.use(vue3SeamlessScroll)
 NProgress.configure({
     easing: 'ease', // 动画方式 
     speed: 500, // 递增进度条的速度 

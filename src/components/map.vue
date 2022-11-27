@@ -1,0 +1,50 @@
+<template>
+    <div id="container">
+
+    </div>
+</template>
+
+<script setup>
+import axios from "axios"
+import { BaiduMap } from 'vue-baidu-map-3x'
+import { onMounted, ref, reactive } from "vue";
+
+const emit = defineEmits(['on-address'])
+onMounted(()=>{
+    var map = new BMap.Map('container')
+    //var geolocation = new BMap.Geolocation()
+    const oldPoint = new BMap.Point(117.653591, 24.512634);//用所定位的经纬度查找所在地省市街道等信息
+    map.centerAndZoom(oldPoint, 15);
+    map.enableScrollWheelZoom(true);
+    // 开启SDK辅助定位
+    //geolocation.enableSDKLocation();
+    navigator.geolocation.getCurrentPosition((position) => {
+        let lat = position.coords.latitude;
+        let lng = position.coords.longitude;
+        const pointBak = new BMap.Point(lng, lat);
+        setTimeout(function () {
+            var convertor = new BMap.Convertor();
+            var pointArr = [];
+            pointArr.push(pointBak);
+            convertor.translate(pointArr, 1, 5, function (resPoint) {
+                if (resPoint && resPoint.points && resPoint.points.length > 0) {
+                    lng = resPoint.points[0].lng;
+                    lat = resPoint.points[0].lat-0.01;
+                }
+                const point = new BMap.Point(lng, lat);
+                const geo = new BMap.Geocoder();
+                geo.getLocation(point, (res) => {
+                    emit('on-address',res);
+                });
+            })
+        }, 1000);
+    });
+})
+</script>
+
+<style lang="less" scoped>
+#container{
+    width: 100px;
+    height:100px;
+}
+</style>

@@ -32,14 +32,21 @@
                 </span>
             </template>
         </el-dialog>
-        <div>
-
+        <div id="card" v-for="o in data.msg" :key="o">
+            <el-card shadow="hover">
+                <span>{{o.type}}</span>
+                <div id="time">
+                    <span id="time-child">{{o.startTime}}-{{ o.endTime }}</span>
+                </div>
+            </el-card>
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
+import axios from "axios"
+import store from '../store/index.js'
 
 const dialogFormVisible = ref(false)
 const value = ref('')
@@ -48,29 +55,35 @@ const radio = ref('验证码签到')
 const data = reactive({
     pass: '',
     msg: [],
-    index: 1,
-    format:[]
+    format: [],
+    tableName:''
+})
+
+onMounted(() => {
+    axios
+        .get("/api/user/getSign",{
+            params:{
+                id:store.state.userInfo.no
+            }
+        })
+        .then(res =>{
+            if(res.data.length>0){
+                res.data.filter(item =>{
+                    data.msg.push(item);
+                })
+            }
+        })
 })
 const defaultTime = new Date()
 
 const releaseSign = () => {
+    if(radio.value=="验证码签到"){
+        if(data.pass==''){
+            alert('请输入验证码');
+            return;
+        }     
+    }
     dialogFormVisible.value = false;
-    if (radio.value == '验证码签到') {
-        data.index = 1;
-    }
-    else if (radio.value == '位置签到') {
-        data.index = 2;
-    }
-    else if (radio.value == '照相签到') {
-        data.index = 3;
-    }
-    else if (radio.value == '普通签到') {
-        data.index = 4;
-    }
-    data.msg.push({
-        title: radio.value,
-        time: value.value,
-    })
     const date = [new Date(value.value[0]), new Date(value.value[1])];
     data.format = [];
     let time = 'YYYY-MM-DD hh:mm:ss'
@@ -104,11 +117,51 @@ const releaseSign = () => {
             // x 为键 replace[x]值，replace[x]替换成obj[x]
         }
         data.format.push(time);
-        time='YYYY-MM-DD hh:mm:ss';
+        time = 'YYYY-MM-DD hh:mm:ss';
     }
+    let dateTest = data.format[0].split(' ').join('').replace(/[\-/:]/g,"_")
+    data.tableName = 'sign_' + radio.value + '_' + store.state.userInfo.username + '_'+dateTest ;
+    axios
+        .post("/api/user/createSign", { name: data.tableName })
+        .then((res) => {
+            if (res.status === 200)
+                alert('发布成功');
+            else
+                alert('错误！')
+        })
+        .catch(error => {
+            alert(error);
+        })
+        let message={
+            type: radio.value,
+            t_id: store.state.userInfo.no,
+            startTime: data.format[0],
+            endTime: data.format[1],
+            number: data.pass,
+            tableName: data.tableName
+        }
+        data.msg.push(message)
+    axios
+        .post("/api/user/addSign", message)
+        .then((res)=>{
+            if (res.status === 200){
+                console.log('添加成功')
+            }
+        })
 }
 </script>
 
 <style lang="less" scoped>
+#card {
+    padding: 10px;
+    cursor: pointer;
+}
 
+#time {
+    float: right;
+    #time-child {
+        font-size: 12px;
+        color: #999;
+    }
+}
 </style>
