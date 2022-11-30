@@ -14,7 +14,9 @@ import {
     GUI
 }
 from 'three/examples/jsm/libs/lil-gui.module.min.js';
-import { TOOLTIP_INJECTION_KEY } from "element-plus";
+import {
+    TOOLTIP_INJECTION_KEY
+} from "element-plus";
 
 class Home3d {
     constructor(selector, onFinish) {
@@ -76,9 +78,9 @@ class Home3d {
         // this.scene.setEnvMap('000');
         //this.scene.background = new THREE.Color("#D2B48C");
         this.scene.add(new THREE.AmbientLight(0x999999));
-        this.scene.rotation.set(0,-Math.PI/4,0);
+        this.scene.rotation.set(0, -Math.PI / 4, 0);
         this.scene.position.set(10, -80, -40)
-        
+
     }
     initCamera() {
         this.camera = new THREE.PerspectiveCamera(
@@ -109,7 +111,7 @@ class Home3d {
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
-        if(this.move == true)
+        if (this.move == true)
             this.moveOnCurve();
         this.renderer.render(this.scene, this.camera);
     }
@@ -147,7 +149,7 @@ class Home3d {
         });
         var mesh = new THREE.Sprite(material);
         /*4、放大图片，每个精灵有自己的大小，默认情况下都是很小的，如果你不放大，基本是看不到的*/
-       
+
 
         return mesh;
     }
@@ -163,16 +165,16 @@ class Home3d {
             console.log(gltf.scene);
             var mesh = this.initSprite("教学楼");
             mesh.position.set(90, 60, -310);
-             mesh.scale.set(30, 30, 1);
+            mesh.scale.set(30, 30, 1);
             console.log(mesh)
             mesh.name = "teach";
             model.add(mesh);
-            
+
             var mesh1 = this.initSprite("图书馆");
             mesh1.position.set(65, 19, -260);
             //console.log(mesh)
-             mesh1.scale.set(30, 30, 1);
-             mesh1.name = "library";
+            mesh1.scale.set(30, 30, 1);
+            mesh1.name = "library";
             model.add(mesh1);
 
             this.scene.add(gltf.scene);
@@ -206,24 +208,25 @@ class Home3d {
             });
     }
 
-    // initGrass() {
-    //      const loader = new GLTFLoader();
-    //      loader.load('/texture/grass/scene.gltf', (gltf) => {
-    //              let model = gltf.scene;
-    //              //model.position.set(20,-50,0);
-    //             // model.scale.set(30,31,31)
-    //              this.scene.add(gltf.scene);
-    //              //this.group.add(gltf.scene);
-    //              //console.log(this.group);
-    //              //console.log(gltf.scene);
+    initBus() {
+        const loader = new GLTFLoader();
+        loader.load('/texture/bus/scene.gltf', (gltf) => {
+                let model = gltf.scene;
 
-    //          }, (e) => {
-    //              this.progressFn(e);
-    //          },
-    //          function (error) {
-    //              console.error(error);
-    //          });
-    // }
+                model.position.set(-80, -19, 80);
+                model.scale.set(3, 3, 3)
+                this.scene.add(gltf.scene);
+                //this.group.add(gltf.scene);
+                //console.log(this.group);
+                //console.log(gltf.scene);
+
+            }, (e) => {
+                this.progressFn(e);
+            },
+            function (error) {
+                console.error(error);
+            });
+    }
 
     createGUI(model, animations) {
         const states = ['Idle', 'Walking', 'Running', 'Dance'];
@@ -247,11 +250,11 @@ class Home3d {
             开始漫游: () => {
                 this.move = true;
             },
-            结束漫游:() => {
+            结束漫游: () => {
                 this.move = false;
             }
         }
-        moveFolder.add(params,"开始漫游");
+        moveFolder.add(params, "开始漫游");
         moveFolder.add(params, "结束漫游");
 
         const api = {
@@ -303,12 +306,13 @@ class Home3d {
             new THREE.Vector3(-68, -19, -76),
             new THREE.Vector3(-68, -19, 20),
             new THREE.Vector3(-10, -19, 20),
+
         ]);
         this.curve.curveType = "catmullrom";
         this.curve.closed = true; //设置是否闭环
         this.curve.tension = 0.5; //设置线的张力，0为无弧度折线
 
-        // 为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
+        //为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
         // const points = this.curve.getPoints(3000);
         // const geometry = new THREE.BufferGeometry().setFromPoints(points);
         // const material = new THREE.LineBasicMaterial({
@@ -319,6 +323,35 @@ class Home3d {
         // const curveObject = new THREE.Line(geometry, material);
         // this.scene.add(curveObject)
     }
+
+    // makeCurveBus() {
+    //     //Create a closed wavey loop
+    //     this.curve = new THREE.CatmullRomCurve3([
+    //         new THREE.Vector3(0, -19, 0),
+    //         new THREE.Vector3(0, -19, -65),
+    //         new THREE.Vector3(70, -19, -65),
+    //         new THREE.Vector3(70, -19, -100),
+    //         new THREE.Vector3(-25, -19, -100),
+    //         new THREE.Vector3(-25, -19, -76),
+    //         new THREE.Vector3(-68, -19, -76),
+    //         new THREE.Vector3(-68, -19, 20),
+    //         new THREE.Vector3(-10, -19, 20),
+    //     ]);
+    //     this.curve.curveType = "catmullrom";
+    //     this.curve.closed = true; //设置是否闭环
+    //     this.curve.tension = 0.5; //设置线的张力，0为无弧度折线
+
+    //     // 为曲线添加材质在场景中显示出来，不显示也不会影响运动轨迹，相当于一个Helper
+    //     const points = this.curve.getPoints(3000);
+    //     const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    //     const material = new THREE.LineBasicMaterial({
+    //         color: 0x000000
+    //     });
+
+    //     // Create the final object to add to the scene
+    //     const curveObject = new THREE.Line(geometry, material);
+    //     this.scene.add(curveObject)
+    // }
     moveOnCurve() {
         if (this.curve == null || this.model == null) {
             console.log('Loading')
@@ -357,12 +390,12 @@ class Home3d {
             }
         }
     }
-    
+
     addMesh() {
         return new Promise((resolve, reject) => {
             this.initBuilding();
             this.initRobot();
-            //this.initGrass();
+            this.initBus();
         })
 
     }
@@ -401,7 +434,7 @@ class Home3d {
         this.camera.fov = fov;
         this.camera.updateProjectionMatrix();
     }
-    onMouseClick(event){
+    onMouseClick(event) {
         var mouse = new THREE.Vector2();
         var raycaster = new THREE.Raycaster();
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -409,8 +442,8 @@ class Home3d {
 
         raycaster.setFromCamera(mouse, this.camera);
         const intersects = raycaster.intersectObjects(this.scene.children);
-        for(let intersect of intersects){
-            if(intersect.object.name == "teach"){
+        for (let intersect of intersects) {
+            if (intersect.object.name == "teach") {
                 document.getElementById("teach").show();
                 break;
             }

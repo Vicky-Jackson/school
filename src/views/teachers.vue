@@ -1,9 +1,9 @@
 <template>
     <div class="nav">
-        <div class="goods-box w">
+        <el-space wrap>
             <card v-for="(student, o) in data.message" :key="o" :message="student">
             </card>
-        </div>
+        </el-space>
     </div>
 </template>
 

@@ -1,44 +1,48 @@
 <template>
     <div id="sign">
-        <el-button type="primary" @click="dialogFormVisible = true">发布签到</el-button>
-        <el-divider />
-        <el-dialog v-model="dialogFormVisible" title="发布签到" width="50%">
-            <span>有效时间：</span>
-            <el-date-picker v-model="value" type="datetimerange" start-placeholder="Start Date"
-                end-placeholder="End Date" :default-time="defaultTime" offset="-100" />
-            <div style="margin-top: 20px;margin-bottom: 20px">
-                <el-radio-group v-model="radio">
-                    <el-radio-button label="验证码签到" />
-                    <el-radio-button label="位置签到" />
-                    <el-radio-button label="照相签到" />
-                    <el-radio-button label="普通签到" />
-                </el-radio-group>
-            </div>
-            <div>
-                <div v-if="radio == '验证码签到'">
-                    <el-form label-width="100px" class="demo-ruleForm" :model="data">
-                        <el-form-item label="请输入验证码">
-                            <el-input v-model="data.pass"></el-input>
-                        </el-form-item>
-                    </el-form>
+        <div id="el-button">
+            <span>历史签到</span>
+            <el-button id="btn" color="#626aef" :dark="isDark" @click="dialogFormVisible = true" round>发布签到</el-button>
+        </div>
+        <div>
+            <el-dialog v-model="dialogFormVisible" title="发布签到" width="50%">
+                <span>有效时间：</span>
+                <el-date-picker v-model="value" type="datetimerange" start-placeholder="Start Date"
+                    end-placeholder="End Date" :default-time="defaultTime" offset="-100" />
+                <div style="margin-top: 20px;margin-bottom: 20px">
+                    <el-radio-group v-model="radio">
+                        <el-radio-button label="验证码签到" />
+                        <el-radio-button label="位置签到" />
+                        <el-radio-button label="照相签到" />
+                        <el-radio-button label="普通签到" />
+                    </el-radio-group>
                 </div>
-            </div>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">Cancel</el-button>
-                    <el-button type="primary" @click="releaseSign">
-                        Confirm
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
-        <div id="card" v-for="o in data.msg" :key="o">
-            <el-card shadow="hover">
-                <span>{{o.type}}</span>
-                <div id="time">
-                    <span id="time-child">{{o.startTime}}-{{ o.endTime }}</span>
+                <div>
+                    <div v-if="radio == '验证码签到'">
+                        <el-form label-width="100px" class="demo-ruleForm" :model="data">
+                            <el-form-item label="请输入验证码">
+                                <el-input v-model="data.pass"></el-input>
+                            </el-form-item>
+                        </el-form>
+                    </div>
                 </div>
-            </el-card>
+                <template #footer>
+                    <span class="dialog-footer">
+                        <el-button @click="dialogFormVisible = false">Cancel</el-button>
+                        <el-button type="primary" @click="releaseSign">
+                            Confirm
+                        </el-button>
+                    </span>
+                </template>
+            </el-dialog>
+            <div id="card" v-for="o in data.msg" :key="o" @click="clickCard(o)">
+                <el-card id="card-item">
+                    <span>{{ o.type }}</span>
+                    <div id="time">
+                        <span id="time-child">{{ o.startTime }}-{{ o.endTime }}</span>
+                    </div>
+                </el-card>
+            </div>
         </div>
     </div>
 </template>
@@ -47,7 +51,10 @@
 import { reactive, ref, onMounted } from 'vue'
 import axios from "axios"
 import store from '../store/index.js'
+import { useRouter } from 'vue-router'
+import { es } from 'element-plus/es/locale';
 
+const router = useRouter();
 const dialogFormVisible = ref(false)
 const value = ref('')
 const radio = ref('验证码签到')
@@ -56,19 +63,19 @@ const data = reactive({
     pass: '',
     msg: [],
     format: [],
-    tableName:''
+    tableName: ''
 })
 
 onMounted(() => {
     axios
-        .get("/api/user/getSign",{
-            params:{
-                id:store.state.userInfo.no
+        .get("/api/user/getSign", {
+            params: {
+                id: store.state.userInfo.no
             }
         })
-        .then(res =>{
-            if(res.data.length>0){
-                res.data.filter(item =>{
+        .then(res => {
+            if (res.data.length > 0) {
+                res.data.filter(item => {
                     data.msg.push(item);
                 })
             }
@@ -76,12 +83,30 @@ onMounted(() => {
 })
 const defaultTime = new Date()
 
+const clickCard = (item) => {
+    let message = [];
+    axios
+        .get('/api/user/getSignStudent',{
+            params:{
+                name:item.tableName
+            }
+        })
+        .then(res=>{
+            if(res.data.length > 0){
+                res.data.filter(item => {
+                    message.push(item);
+                })
+            }
+        })
+    store.commit('setSignStudent',message);
+    router.push('/signDetail');
+}
 const releaseSign = () => {
-    if(radio.value=="验证码签到"){
-        if(data.pass==''){
+    if (radio.value == "验证码签到") {
+        if (data.pass == '') {
             alert('请输入验证码');
             return;
-        }     
+        }
     }
     dialogFormVisible.value = false;
     const date = [new Date(value.value[0]), new Date(value.value[1])];
@@ -119,8 +144,8 @@ const releaseSign = () => {
         data.format.push(time);
         time = 'YYYY-MM-DD hh:mm:ss';
     }
-    let dateTest = data.format[0].split(' ').join('').replace(/[\-/:]/g,"_")
-    data.tableName = 'sign_' + radio.value + '_' + store.state.userInfo.username + '_'+dateTest ;
+    let dateTest = data.format[0].split(' ').join('').replace(/[\-/:]/g, "_")
+    data.tableName = 'sign_' + radio.value + '_' + store.state.userInfo.username + '_' + dateTest;
     axios
         .post("/api/user/createSign", { name: data.tableName })
         .then((res) => {
@@ -132,36 +157,73 @@ const releaseSign = () => {
         .catch(error => {
             alert(error);
         })
-        let message={
-            type: radio.value,
-            t_id: store.state.userInfo.no,
-            startTime: data.format[0],
-            endTime: data.format[1],
-            number: data.pass,
-            tableName: data.tableName
-        }
-        data.msg.push(message)
+    let message = {
+        type: radio.value,
+        t_id: store.state.userInfo.no,
+        startTime: data.format[0],
+        endTime: data.format[1],
+        number: data.pass,
+        tableName: data.tableName
+    }
+    data.msg.push(message)
     axios
         .post("/api/user/addSign", message)
-        .then((res)=>{
-            if (res.status === 200){
+        .then((res) => {
+            if (res.status === 200) {
                 console.log('添加成功')
             }
         })
+    data.pass='';
 }
 </script>
 
 <style lang="less" scoped>
+#sign {
+    height: 100vh;
+    width: 100%;
+    background-color: black;
+
+}
+
 #card {
+    // background-color: rgb(40, 36, 36);
     padding: 10px;
+
     cursor: pointer;
+
+    #card-item {
+        background-color: rgb(40, 36, 36);
+        color: white;
+        border: 2px solid rgb(72, 90, 114);
+    }
+
+    #card-item:hover {
+        border: 2px solid rgb(132, 132, 132);
+    }
 }
 
 #time {
     float: right;
+
     #time-child {
         font-size: 12px;
-        color: #999;
+        color: rgb(107, 89, 89);
+    }
+}
+
+#el-button {
+    width: 100%;
+    padding: 5px;
+
+    #btn {
+        position: relative;
+        left: 82%;
+        right: 0;
+    }
+
+    span {
+        color: rgb(210, 201, 201);
+        font-size: 30px;
     }
 }
 </style>

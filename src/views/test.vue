@@ -7,6 +7,7 @@
             </li>
         </ul>
     </vue3-seamless-scroll>
+    <h2>hhhhh</h2>
 </template>
 
 <script setup>
@@ -51,7 +52,6 @@ const data = reactive({
     width: 360px;
     margin: 0 auto;
     overflow: hidden;
-
     ul {
         list-style: none;
         padding: 0;

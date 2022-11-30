@@ -60,11 +60,25 @@ router.get('/getUser', (req, res) => {
     });
 });
 
+router.get('/getMessage', (req, res) => {
+    let sql = $sql.user.getMessage;
+    let params = req.query;
+    console.log(params);
+
+    conn.query(sql, [params.id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
 router.get('/getStudents', (req, res) => {
     let sql = $sql.user.getStudents;
     let params = req.body;
     console.log(params);
-
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -79,7 +93,6 @@ router.get('/getTeachers', (req, res) => {
     let sql = $sql.user.getTeachers;
     let params = req.body;
     console.log(params);
-
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -94,7 +107,7 @@ router.post('/createSign', (req, res) => {
     let params = req.body;
     console.log(params);
     let sql = 'create table ' + params.name +
-        '(id int  auto_increment not null primary key,s_id varchar(255) not null,time datetime not null,address varchar(255),photo longtext)';
+        '(id int  auto_increment not null primary key,s_id varchar(255) not null,s_name varchar(255) not null,time datetime not null,address varchar(255),photo longtext)';
     sql.replace(/[\\"']/g, "");
     conn.query(sql, (err, result) => {
         if (err) {
@@ -126,7 +139,7 @@ router.post('/addSignin', (req, res) => {
     var sql = ("insert into" + params.tableName).replace(/[\\"']/g, "")+'(s_id,time,address,photo) values(?,?,?,?)';
     
     // ! [params.username, params.age] 自动填充到之前 ？ 里面
-    conn.query(sql, [params.s_id, params.time, params.address, params.photo], (err, result) => {
+    conn.query(sql, [params.s_id, params.s_name, params.time, params.address, params.photo], (err, result) => {
         if (err)
             console.log(err);
         if (result) {
@@ -135,13 +148,27 @@ router.post('/addSignin', (req, res) => {
     });
 });
 
-router.get('/getSignin', (req, res) => {
-    var params = req.body;
+router.get('/getSignStudent', (req, res) => {
+    var params = req.query;
+    var sql = ("select *" + params.name).replace(/[\\"']/g, "");
+    if(params.id)
+        sql+='where s_id = '+ params.id;
     console.log(params);
-    var sql = ("select *" + params.tableName).replace(/[\\"']/g, "") + 'where s_id = ?';
+    conn.query(sql, (err, result) => {
+        if (err)
+            console.log(err);
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
 
+router.get('/getSignStudent', (req, res) => {
+    var sql = $sql.user.getSignin;
+    var params = req.query;
+    console.log(params);
     // ! [params.username, params.age] 自动填充到之前 ？ 里面
-    conn.query(sql, [paramsid], (err, result) => {
+    conn.query(sql, [params.id], (err, result) => {
         if (err)
             console.log(err);
         if (result) {
@@ -152,7 +179,7 @@ router.get('/getSignin', (req, res) => {
 
 router.get('/getSign', (req, res) => {
     let sql = $sql.user.getSign;
-    let params = req.body;
+    let params = req.query;
     console.log(params);
 
     conn.query(sql, [params.id], (err, result) => {
@@ -196,12 +223,43 @@ router.post('/createWork', (req, res) => {
     });
 });
 
+router.post('/addWork', (req, res) => {
+    var sql = $sql.user.addWork;
+    var params = req.body;
+    console.log(params);
+    // ! [params.username, params.age] 自动填充到之前 ？ 里面
+    conn.query(sql, [params.t_id, params.title,params.startTime, params.endTime, params.detail, params.tableName], (err, result) => {
+        if (err)
+            console.log(err);
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
 
 router.get('/getAnouncement', (req, res) => {
     let sql = $sql.user.getAnouncement;
-    let params = req.body;
+    let params = req.query;
     console.log(params);
 
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getScore', (req, res) => {
+    let sql = $sql.user.getAnouncement;
+    let params = req.query;
+    console.log(params);
+    if(params.t_id)
+        sql+='where t_id = '+params.t_id;
+    else if(params.s_id)
+        sql+='where s_id = '+params.s_id;
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);

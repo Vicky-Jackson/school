@@ -1,17 +1,13 @@
 <template>
-    <el-row class="card-item">
-        <el-col >
-            <el-card :body-style="{ padding: '0px' }" @click="clickCard">
-                <img class='image' src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png">
-                <div>
-                    <span>姓名：{{message.message.s_name}}</span>
-                    <div>
-                        <span>性别：{{message.message.sex}}</span>
-                    </div>
-                </div>
-            </el-card>
-        </el-col>
-    </el-row>
+    <el-card :body-style="{ padding: '0px' }" @click="clickCard">
+        <img class='image' src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png">
+        <div>
+            <span>姓名：{{ message.message.s_name }}</span>
+            <div>
+                <span>性别：{{ message.message.sex }}</span>
+            </div>
+        </div>
+    </el-card>
 </template>
 
 <script setup>
@@ -19,10 +15,10 @@ import { provide } from "@vue/runtime-core"
 import { useRouter } from 'vue-router'
 import store from '../store/index.js'
 const message = defineProps({
-    message:{}
+    message: {}
 })
 const router = useRouter();
-const clickCard = ()=>{
+const clickCard = () => {
     store.commit('setMessage', message.message);
     router.push("/card");
 }
@@ -43,7 +39,7 @@ const clickCard = ()=>{
     border: none;
 }
 
-span{
+span {
     text-align: center;
 }
 </style>

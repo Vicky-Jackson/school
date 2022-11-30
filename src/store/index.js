@@ -3,8 +3,9 @@ import { createStore } from "vuex";
 const store = createStore({
     state:{
          userInfo: (sessionStorage.getItem('loginData') && JSON.parse(sessionStorage.getItem('loginData'))) || {},
-         message:{},
+         message: (sessionStorage.getItem('message') && JSON.parse(sessionStorage.getItem('message'))) || {},
          constRoutes: sessionStorage.getItem('routes') || [],
+         signStudent:[]
     },
     mutations:{
         setUserInfo(state, uInfo) {
@@ -15,6 +16,9 @@ const store = createStore({
         },
         setRoutes(state, constRoutes) {
             state.constRoutes = constRoutes
+        },
+        setSignStudent(state, signStudent) {
+            state.signStudent = signStudent
         }
     },
     actions:{},

@@ -19,18 +19,18 @@
     </el-dialog>
 
     <el-dialog v-model="data.dialog[1]" title="位置签到">
-        <map @on-address="getAddress"></map>
+        <common-map @on-address="getAddress" style="width:600px;height:400px"></common-map>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="data.dialog[1] = false">Cancel</el-button>
                 <el-button type="primary" @click="releaseSign">
-                    Confirm
+                    签到
                 </el-button>
             </span>
         </template>
     </el-dialog>
 
-    <el-dialog v-model="data.dialog[2]" title="拍照签到">
+    <el-dialog v-model="data.dialog[2]" title="照相签到">
         <photo @on-photo="getPhoto"></photo>
         <template #footer>
             <span class="dialog-footer">
@@ -57,7 +57,7 @@
             </span>
         </template>
     </el-dialog>
-   
+
 </template>
 
 <script setup>
@@ -65,7 +65,7 @@ import axios from "axios"
 import { BaiduMap } from 'vue-baidu-map-3x'
 import { onMounted, ref, reactive } from "vue";
 import Photo from '../components/photo.vue'
-import Map from '../components/map.vue'
+import commonMap from '../components/map.vue'
 import store from '../store/index'
 import { ElMessage } from 'element-plus'
 
@@ -97,7 +97,7 @@ onMounted(() => {
 })
 const clickSign = (item) => {
     data.click = item;
-    axios.get('/api/user/getSignin', {
+    axios.get('/api/user/getSignStudent', {
         params: {
             tableName: item.tableName,
             id: store.state.userInfo.no
@@ -111,19 +111,18 @@ const clickSign = (item) => {
             })
         }
     })
-    if (data.dialog[4] !== true) {
-        if (item.type == '普通签到') {
-            data.dialog[0] = true
-        }
-        else if (item.type == '位置签到') {
-            data.dialog[1] = true
-        }
-        else if (item.type == '拍照签到') {
-            data.dialog[2] = true
-        }
-        else if (item.type == '验证码签到') {
-            data.dialog[3] = true
-        }
+
+    if (item.type == '普通签到') {
+        data.dialog[0] = true
+    }
+    else if (item.type == '位置签到') {
+        data.dialog[1] = true
+    }
+    else if (item.type == '照相签到') {
+        data.dialog[2] = true
+    }
+    else if (item.type == '验证码签到') {
+        data.dialog[3] = true
     }
 
 }
@@ -136,6 +135,12 @@ const getPhoto = (image) => {
     data.image = image;
 }
 const releaseSign = () => {
+    if(data.dialog[3] === true){
+        if(data.pass !== data.click.number){
+            alert('验证码错误');
+            return;
+        }
+    }
     data.dialog.filter(item => item = false);
     const time = new Date();
     const endTime = new Date(data.msg.endTime)
@@ -146,6 +151,7 @@ const releaseSign = () => {
     const message = {
         tableName: data.click.tableName,
         s_id: data.click.s_id,
+        s_name:store.state.message.name,
         time: new Date(),
         address: data.address,
         photo: data.image
@@ -165,5 +171,14 @@ const releaseSign = () => {
 #card {
     padding: 10px;
     cursor: pointer;
+}
+
+#time {
+    float: right;
+
+    #time-child {
+        font-size: 12px;
+        color: #999;
+    }
 }
 </style>

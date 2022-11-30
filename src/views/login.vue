@@ -24,7 +24,7 @@
 
 <script setup>
 import Login3d from '../util/Login3d'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 import {
     reactive, onMounted
 } from 'vue'
@@ -33,51 +33,65 @@ import store from '../store/index.js'
 import Loading from "../components/Loading.vue"
 const data = reactive({
     login3d: {},
-    isLoading:true,
-    progress:0,
-    loginData:{
-        username:'',
-        password:'',
+    isLoading: true,
+    progress: 0,
+    loginData: {
+        username: '',
+        password: '',
     }
 })
 const router = useRouter();
 
-function loadingFinish(){
-    data.isLoading=false;
+function loadingFinish() {
+    data.isLoading = false;
 }
 onMounted(() => {
-    data.login3d = new Login3d('.login',loadingFinish);
-    data.login3d.onProgress((e)=>{
+    data.login3d = new Login3d('.login', loadingFinish);
+    data.login3d.onProgress((e) => {
         let progressNum = e.loaded / e.total;
         progressNum = progressNum.toFixed(2) * 100;
         data.progress = progressNum;
     })
 })
-const query = ()=>{
+const query = () => {
     axios
-        .get("/api/user/getUser", 
-        {params:{
-            username: data.loginData.username,
-            password: data.loginData.password
-        }})
+        .get("/api/user/getUser",
+            {
+                params: {
+                    username: data.loginData.username,
+                    password: data.loginData.password
+                }
+            })
         .then((res) => {
             if (res.data.length > 0) {
-                
                 store.commit('setUserInfo', res.data[0])
                 sessionStorage.setItem('loginData', JSON.stringify(res.data[0]))
                 //跳转到  /index  页面
-                console.log(store.state.userInfo.username);
+                axios
+                    .get('/api/user/getMessage', {
+                        params: {
+                            id: store.state.userInfo.no
+                        }
+                    })
+                    .then(res => {
+                        if (res.data.length > 0) {
+                            store.commit('setMessage', res.data[0]);
+                            sessionStorage.setItem('message', JSON.stringify(res.data[0]))
+                            console.log(res.data);
+                        }
+                    })
                 router.push({
                     path: '/'
                 })
             }
-            else{
+            else {
                 alert("用户名或密码错误！");
             }
         })
         .catch((error) => {
             alert(error);
         });
+    
 }
 </script>
 
@@ -93,7 +107,8 @@ const query = ()=>{
     position: fixed;
     top: 30%;
     left: 15%;
-    .title{
+
+    .title {
         color: aliceblue;
         font-size: 40px;
         margin-bottom: 50px;

@@ -8,86 +8,128 @@ import store from '../store/index.js';
 const routes = [{
         path: "/",
         name: "home",
-        component: () => import("../views/home.vue")
+        component: () => import("../views/home.vue"),
+        meta: {
+            keepAlive: true
+        }
 
     },
     {
         path: "/number",
         name: "number",
-        component: () => import("../views/number.vue")
-
+        component: () => import("../views/number.vue"),
+        meta: {
+            keepAlive: true
+        }
     },
     {
         path: "/login",
         name: "login",
-        component: () => import("../views/login.vue")
-
+        component: () => import("../views/login.vue"),
+        meta: {
+            keepAlive: false
+        }
     },
     {
         path: "/sign",
         name: "sign",
         component: () => import("../views/sign.vue"),
         meta: {
-            role: ['student', 'admin']
+            role: ['student', 'admin'],
+            keepAlive: true
         }
 
     },
     {
         path: "/students",
         name: "students",
-        component: () => import("../views/message.vue")
-
+        component: () => import("../views/message.vue"),
+        meta: {
+            keepAlive: true
+        }
     },
     {
         path: "/timetable",
         name: "timetable",
-        component: () => import("../views/timetable.vue")
-
+        component: () => import("../views/timetable.vue"),
+        meta: {
+            keepAlive: true
+        }
     },
     {
         path: "/card",
         name: "card",
-        component: () => import("../views/detail.vue")
+        component: () => import("../views/detail.vue"),
+        meta: {
+            keepAlive: true
+        }
 
-
+    },
+    {
+        path: "/score",
+        name: "score",
+        component: () => import("../views/score.vue"),
+        meta: {
+            keepAlive: true
+        }
+    },
+    {
+        path: "/detail",
+        name: "detail",
+        component: () => import("../views/detail.vue"),
+        meta: {
+            keepAlive: true
+        }
     },
     {
         path: "/library",
         name: "library",
         component: () => import("../views/library.vue"),
-
-    },
-    {
-        path: "/photo",
-        name: "photo",
-        component: () => import("../views/photo.vue"),
-
+        meta: {
+            keepAlive: true
+        }
     },
     {
         path: "/test",
         name: "test",
         component: () => import("../views/test.vue"),
-        meta: {
-            role: ['student','admin']
-        }
+       meta: {
+           keepAlive: true
+       }
     },
     {
         path: "/signin",
         name: "signin",
         component: () => import("../views/signIn.vue"),
         meta: {
-            role: ['teacher', 'admin']
+            role: ['teacher', 'admin'],
+            keepAlive:true
         }
-    }, 
+    },
+    {
+        path: "/signDetail",
+        name: "signsdetail",
+        component: () => import("../views/signDetail.vue"),
+        meta: {
+            role: ['teacher', 'admin'],
+            keepAlive: true
+        }
+    },
     {
         path: "/work",
         name: "work",
         component: () => import("../views/work.vue"),
+        meta: {
+            keepAlive: true
+        }
     },
     {
         path: "/404",
         name: "error",
         component: () => import("../views/error.vue"),
+        meta: {
+            keepAlive: true
+        }
     }
 ];
 
@@ -101,7 +143,6 @@ router.beforeEach((to, from, next) => {
     // from: 到哪个页面
     // next: 只有执行next()页面
     //判断用户是否登录
-    
     if (!store.state.userInfo.username) {
         // 未登录，跳转到login页面
         if (to.path === '/login') {

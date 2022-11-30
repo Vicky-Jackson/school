@@ -1,8 +1,11 @@
 <template>
     <div class="nav">
         <div class="goods-box w">
-            <card v-for="(student,o) in data.message" :key="o" :message="student">
-            </card>
+            <el-space wrap>
+                <card v-for="(student, o) in data.message" :key="o" :message="student">
+                </card>
+            </el-space>
+
         </div>
     </div>
 </template>
@@ -16,9 +19,9 @@ const data = reactive({
     message: {}
 })
 axios
-.get('/api/user/getStudents', {})
-.then((res) => { 
-    data.message = res.data;
+    .get('/api/user/getStudents', {})
+    .then((res) => {
+        data.message = res.data;
     });
 </script>
 
