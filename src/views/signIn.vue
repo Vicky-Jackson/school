@@ -52,7 +52,6 @@ import { reactive, ref, onMounted } from 'vue'
 import axios from "axios"
 import store from '../store/index.js'
 import { useRouter } from 'vue-router'
-import { es } from 'element-plus/es/locale';
 
 const router = useRouter();
 const dialogFormVisible = ref(false)
@@ -76,13 +75,41 @@ onMounted(() => {
         .then(res => {
             if (res.data.length > 0) {
                 res.data.filter(item => {
+                    item.startTime = getTime(item.startTime);
+                    item.endTime = getTime(item.endTime);
                     data.msg.push(item);
                 })
             }
         })
 })
 const defaultTime = new Date()
-
+let getTime = (time) => {
+    time = new Date(time);
+    let commonTime = 'YYYY-MM-DD hh:mm:ss'
+    var objs = [
+        {
+            YYYY: time.getFullYear(),
+            MM: time.getMonth() + 1,
+            DD: time.getDate(),
+            hh: time.getHours(),
+            mm: time.getMinutes(),
+            ss: time.getSeconds(),
+        }
+    ]
+    // 定义改变后的格式
+    for (let obj of objs) {
+        for (let x in obj) {
+            // 遍历对象 x为key
+            if (obj[x] < 10) {
+                // 当获取的值小于10 加一个0在前面
+                obj[x] = '0' + obj[x]
+            }
+            commonTime = commonTime.replace([x], obj[x])
+            // x 为键 replace[x]值，replace[x]替换成obj[x]
+        }
+    }
+    return commonTime;
+}
 const clickCard = (item) => {
     let message = [];
     axios
@@ -109,41 +136,7 @@ const releaseSign = () => {
         }
     }
     dialogFormVisible.value = false;
-    const date = [new Date(value.value[0]), new Date(value.value[1])];
-    data.format = [];
-    let time = 'YYYY-MM-DD hh:mm:ss'
-    var objs = [
-        {
-            YYYY: date[0].getFullYear(),
-            MM: date[0].getMonth() + 1,
-            DD: date[0].getDate(),
-            hh: date[0].getHours(),
-            mm: date[0].getMinutes(),
-            ss: date[0].getSeconds(),
-        },
-        {
-            YYYY: date[1].getFullYear(),
-            MM: date[1].getMonth() + 1,
-            DD: date[1].getDate(),
-            hh: date[1].getHours(),
-            mm: date[1].getMinutes(),
-            ss: date[1].getSeconds(),
-        },
-    ]
-    // 定义改变后的格式
-    for (let obj of objs) {
-        for (let x in obj) {
-            // 遍历对象 x为key
-            if (obj[x] < 10) {
-                // 当获取的值小于10 加一个0在前面
-                obj[x] = '0' + obj[x]
-            }
-            time = time.replace([x], obj[x])
-            // x 为键 replace[x]值，replace[x]替换成obj[x]
-        }
-        data.format.push(time);
-        time = 'YYYY-MM-DD hh:mm:ss';
-    }
+    data.format = [getTime(value.value[0]), getTime(value.value[1])];
     let dateTest = data.format[0].split(' ').join('').replace(/[\-/:]/g, "_")
     data.tableName = 'sign_' + radio.value + '_' + store.state.userInfo.username + '_' + dateTest;
     axios

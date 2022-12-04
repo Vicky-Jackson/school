@@ -11,7 +11,8 @@ module.exports = {
         getAnouncement: "select * from anouncement",
         getScore:"select * from scoredetail",
         addSign: "insert into releasesign(type,t_id,startTime,endTime,number,tableName) values(?,?,?,?,?,?)",
-        addWork: "insert into releasework(t_id,title,startTime,endTime,detail,tableName) values(?,?,?,?,?)",
+        addWork: "insert into releasework(t_id,title,startTime,endTime,detail,tableName) values(?,?,?,?,?,?)",
         getWork: "select * from releaseWork where t_id = ?",
-    },
+        getWorkin: "select * from workdetail where s_id = ?",
+    }, 
 };

@@ -1,10 +1,10 @@
 <template>
-    <div id="sign">
+    <div id="work">
         <el-button type="primary" @click="dialogFormVisible = true">发布作业</el-button>
         <el-dialog v-model="dialogFormVisible" title="发布作业" width="50%">
             <span>有效时间：</span>
             <el-date-picker v-model="value" type="datetimerange" start-placeholder="Start Date"
-                end-placeholder="End Date" :default-time="defaultTime" />
+                end-placeholder="End Date" :default-time="defaultTime" offset="-100"/>
             <div style="margin-top: 20px;margin-bottom: 20px">
                 <el-form label-width="100px" class="demo-ruleForm" :model="data">
                     <el-form-item label="作业题目">
@@ -27,10 +27,10 @@
             </template>
         </el-dialog>
         <div id="card" v-for="o in data.msg" :key="o">
-            <el-card shadow="hover">
+            <el-card id="card-item">
                 <span>{{o.title}}</span>
                 <div id="time">
-                    <span id="time-child">{{o.startTime}}-{{o.endTime}}</span>
+                    <span id="time-child">{{ o.startTime}}-{{o.endTime}}</span>
                 </div>
             </el-card>
         </div>
@@ -62,36 +62,25 @@ onMounted(() => {
         .then(res=>{
             if(res.data.length>0)
                 res.data.filter(item=>{
-                    data.msg.push(item)
+                    item.startTime = getTime(item.startTime);
+                    item.endTime = getTime(item.endTime);
+                    data.msg.push(item);
+                    
                 })
         })
 })
-const release = () => {
-    if(data.title==''||data.workMsg==''){
-        alert('信息未填写完整')
-        return;
-    }
-    dialogFormVisible.value = false;
-    const date = [new Date(value.value[0]), new Date(value.value[1])];
-    data.format = [];
-    let time = 'YYYY-MM-DD hh:mm:ss'
+let getTime = (time)=>{
+    time = new Date(time);
+    let commonTime = 'YYYY-MM-DD hh:mm:ss'
     var objs = [
         {
-            YYYY: date[0].getFullYear(),
-            MM: date[0].getMonth() + 1,
-            DD: date[0].getDate(),
-            hh: date[0].getHours(),
-            mm: date[0].getMinutes(),
-            ss: date[0].getSeconds(),
-        },
-        {
-            YYYY: date[1].getFullYear(),
-            MM: date[1].getMonth() + 1,
-            DD: date[1].getDate(),
-            hh: date[1].getHours(),
-            mm: date[1].getMinutes(),
-            ss: date[1].getSeconds(),
-        },
+            YYYY: time.getFullYear(),
+            MM: time.getMonth() + 1,
+            DD: time.getDate(),
+            hh: time.getHours(),
+            mm: time.getMinutes(),
+            ss: time.getSeconds(),
+        }
     ]
     // 定义改变后的格式
     for (let obj of objs) {
@@ -101,12 +90,19 @@ const release = () => {
                 // 当获取的值小于10 加一个0在前面
                 obj[x] = '0' + obj[x]
             }
-            time = time.replace([x], obj[x])
+            commonTime = commonTime.replace([x], obj[x])
             // x 为键 replace[x]值，replace[x]替换成obj[x]
         }
-        data.format.push(time);
-        time = 'YYYY-MM-DD hh:mm:ss';
     }
+    return commonTime;
+}
+const release = () => {
+    if(data.title==''||data.workMsg==''){
+        alert('信息未填写完整')
+        return;
+    }
+    dialogFormVisible.value = false;
+    data.format = [getTime(value.value[0]), getTime(value.value[1])];
     let dateTest = data.format[0].split(' ').join('').replace(/[\-/:]/g, "_")
     data.tableName = 'work_' + data.title + '_' + store.state.userInfo.username + '_' + dateTest;
     axios
@@ -130,7 +126,7 @@ const release = () => {
     }
     data.msg.push(message)
     axios
-        .post('/api/user/addeWork',message)
+        .post('/api/user/addWork',message)
         .then(res=>{
             if(res.status === 200)
                 alert('success')
@@ -142,10 +138,28 @@ const release = () => {
 </script>
 
 <style lang="less" scoped>
-#card {
-    padding: 10px;
-    cursor: pointer;
+#work {
+    width: 100%;
+    min-height: 100vh;
+    background-color: black;
 }
+#card {
+    // background-color: rgb(40, 36, 36);
+    padding: 10px;
+
+    cursor: pointer;
+
+    #card-item {
+        background-color: rgb(40, 36, 36);
+        color: white;
+        border: 2px solid rgb(72, 90, 114);
+    }
+
+    #card-item:hover {
+        border: 2px solid rgb(132, 132, 132);
+    }
+}
+
 
 #time {
     float: right;

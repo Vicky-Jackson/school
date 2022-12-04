@@ -81,5 +81,7 @@ onMounted(() => {
     background-color: black;
 }
 
-.tableClass {}
+.tableClass {
+    padding:10px ;
+}
 </style>

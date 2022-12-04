@@ -15,10 +15,10 @@ export default defineConfig({
    server: {
      host: "0.0.0.0",
     // https:true,
-     https: {
-       cert: fs.readFileSync(path.join(__dirname, 'key/cert.crt')),
-       key: fs.readFileSync(path.join(__dirname, 'key/cert.key')),
-     },
+    //  https: {
+    //    cert: fs.readFileSync(path.join(__dirname, 'key/cert.crt')),
+    //    key: fs.readFileSync(path.join(__dirname, 'key/cert.key')),
+    //  },
       proxy: {
         '/api': {
           target: 'http://127.0.0.1:8888/api',

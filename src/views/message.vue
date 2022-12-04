@@ -1,12 +1,9 @@
 <template>
     <div class="nav">
-        <div class="goods-box w">
-            <el-space wrap>
-                <card v-for="(student, o) in data.message" :key="o" :message="student">
+            <el-space wrap :size="10">
+                <card v-for="(student, o) in data.message" :key="o" :message="student">       
                 </card>
             </el-space>
-
-        </div>
     </div>
 </template>
 
@@ -26,15 +23,18 @@ axios
 </script>
 
 <style lang="less" scoped>
-.w {
-    width: 1220px;
-    margin: 0 auto;
-}
+// .w {
+//     width: 1220px;
+//     margin: 0 auto;
+// }
 
 .nav {
-    height: 60px;
-    line-height: 60px;
-
+    // height: 60px;
+    // line-height: 60px;
+    width:100%;
+    height:100vh;
+    background-color: black;
+    padding:10px;
     >div {
         display: flex;
         align-items: center;

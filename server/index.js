@@ -6,8 +6,11 @@ const app = express();
 // 导入路由模块
 const userApi = require('./api/userApi');
 // 端口号
+const path = require('path');
+
 const port = 8888;
 // 注册全局解析中间件
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({
     extended: false

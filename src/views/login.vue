@@ -55,14 +55,9 @@ onMounted(() => {
 })
 const query = () => {
     axios
-        .get("/api/user/getUser",
-            {
-                params: {
-                    username: data.loginData.username,
-                    password: data.loginData.password
-                }
-            })
+        .post("/api/user/getUser",data.loginData)
         .then((res) => {
+            console.log(res);
             if (res.data.length > 0) {
                 store.commit('setUserInfo', res.data[0])
                 sessionStorage.setItem('loginData', JSON.stringify(res.data[0]))

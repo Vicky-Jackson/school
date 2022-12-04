@@ -10,6 +10,7 @@ const routes = [{
         name: "home",
         component: () => import("../views/home.vue"),
         meta: {
+            title: '首页',
             keepAlive: true
         }
 
@@ -19,6 +20,7 @@ const routes = [{
         name: "number",
         component: () => import("../views/number.vue"),
         meta: {
+            title: '新生数据',
             keepAlive: true
         }
     },
@@ -33,95 +35,155 @@ const routes = [{
     {
         path: "/sign",
         name: "sign",
-        component: () => import("../views/sign.vue"),
         meta: {
-            role: ['student', 'admin'],
-            keepAlive: true
-        }
+            title: '签到',
+        },
+        children: [{
+                path: "/signin",
+                name: "signin",
+                component: () => import("../views/signIn.vue"),
+                meta: {
+                    title: '发布签到',
+                    role: ['teacher', 'admin'],
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/signstudent",
+                name: "signstudent",
+                component: () => import("../views/sign.vue"),
+                meta: {
+                    title: '签到',
+                    role: ['student', 'admin'],
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/signDetail",
+                name: "signsdetail",
+                component: () => import("../views/signDetail.vue"),
+                meta: {
+                    role: ['teacher', 'admin'],
+                    keepAlive: true
+                }
+            },
+        ]
 
     },
     {
-        path: "/students",
-        name: "students",
-        component: () => import("../views/message.vue"),
+        path: "/message",
+        name: "message",
         meta: {
-            keepAlive: true
-        }
-    },
-    {
-        path: "/timetable",
-        name: "timetable",
-        component: () => import("../views/timetable.vue"),
-        meta: {
-            keepAlive: true
-        }
-    },
-    {
-        path: "/card",
-        name: "card",
-        component: () => import("../views/detail.vue"),
-        meta: {
-            keepAlive: true
-        }
-
+            title: '信息',
+        },
+        children: [{
+                path: "/students",
+                name: "students",
+                component: () => import("../views/message.vue"),
+                meta: {
+                    title: '学生信息',
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/teachers",
+                name: "teachers",
+                component: () => import("../views/teachers.vue"),
+                meta: {
+                    title: '老师信息',
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/detail",
+                name: "detail",
+                component: () => import("../views/detail.vue"),
+                meta: {
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/timetable",
+                name: "timetable",
+                component: () => import("../views/timetable.vue"),
+                meta: {
+                    title: "课程表",
+                    keepAlive: true
+                }
+            },
+        ]
     },
     {
         path: "/score",
         name: "score",
-        component: () => import("../views/score.vue"),
         meta: {
-            keepAlive: true
-        }
-    },
-    {
-        path: "/detail",
-        name: "detail",
-        component: () => import("../views/detail.vue"),
-        meta: {
-            keepAlive: true
-        }
-    },
-    {
-        path: "/library",
-        name: "library",
-        component: () => import("../views/library.vue"),
-        meta: {
-            keepAlive: true
-        }
+            title: "成绩",
+        },
+        children: [{
+                path: "/scoreTeacher",
+                name: "scoreTeacher",
+                component: () => import("../views/score.vue"),
+                meta: {
+                    title: '学生成绩',
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/scorestudent",
+                name: "scorestudent",
+                component: () => import("../views/scoreStudent.vue"),
+                meta: {
+                    title: '成绩分析',
+                    keepAlive: true
+                }
+            },
+        ]
+
     },
     {
         path: "/test",
         name: "test",
         component: () => import("../views/test.vue"),
-       meta: {
-           keepAlive: true
-       }
-    },
-    {
-        path: "/signin",
-        name: "signin",
-        component: () => import("../views/signIn.vue"),
         meta: {
-            role: ['teacher', 'admin'],
-            keepAlive:true
-        }
-    },
-    {
-        path: "/signDetail",
-        name: "signsdetail",
-        component: () => import("../views/signDetail.vue"),
-        meta: {
-            role: ['teacher', 'admin'],
             keepAlive: true
         }
     },
     {
         path: "/work",
         name: "work",
-        component: () => import("../views/work.vue"),
-        meta: {
-            keepAlive: true
-        }
+         meta: {
+             title: '作业',
+         },
+        children: [{
+                path: "/workstudent",
+                name: "workstudent",
+                component: () => import("../views/work.vue"),
+                meta: {
+                    title: '作业',
+                    role: ['student', 'admin'],
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/releasework",
+                name: "releasework",
+                component: () => import("../views/releaseWork.vue"),
+                meta: {
+                    title: '发布作业',
+                    role: ['teacher', 'admin'],
+                    keepAlive: true
+                }
+            },
+            {
+                path: "/workDetail",
+                name: "workDetail",
+                component: () => import("../views/workDetail.vue"),
+                meta: {
+                    role: ['teacher', 'admin'],
+                    keepAlive: true
+                }
+            },
+        ]
     },
     {
         path: "/404",
@@ -151,10 +213,27 @@ router.beforeEach((to, from, next) => {
         }
         next('/login')
     } else {
+        //next();
         // 已登录
         const role = store.state.userInfo.role;
-        const constRoutes = routes.filter(item => {
-            return item.meta?.role?.includes(role) || !item.meta || !item.meta?.role;
+        const constRoutes = []
+        routes.filter(item => {
+            let child = []
+            if (item.children){
+                    item.children.filter(res => {
+                        if (res.meta?.role?.includes(role) || !res.meta?.role) {
+                                child.push(res);
+                    }
+                })
+                item.children = child;
+                constRoutes.push(item);
+            }
+                
+            else {
+                if (item.meta?.role?.includes(role) || !item.meta?.role) {
+                    constRoutes.push(item);
+                }
+            }
         })
         store.commit('setRoutes', constRoutes);
         sessionStorage.setItem('routes', constRoutes);

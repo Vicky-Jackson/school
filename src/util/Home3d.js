@@ -86,11 +86,11 @@ class Home3d {
         this.camera = new THREE.PerspectiveCamera(
             45,
             window.innerWidth / window.innerHeight,
-            1,
+            0.1,
             1000
         );
         this.camera.position.set(0, 80, 100);
-
+        this.camera.rotation.set(0, -Math.PI / 4, 0);
     }
     initRenderer() {
         this.renderer = new THREE.WebGLRenderer({
@@ -111,8 +111,12 @@ class Home3d {
     render() {
         var delta = this.clock.getDelta();
         this.mixer && this.mixer.update(delta);
-        if (this.move == true)
+        if (this.move == true){
             this.moveOnCurve();
+        }
+        else{
+            this.camera.position.set(0, 80, 100);
+        }   
         this.renderer.render(this.scene, this.camera);
     }
     animate() {
@@ -375,8 +379,8 @@ class Home3d {
                     //this.model.lookAt(point.x, point.y, point.z);
 
                 }
-                this.camera.position.set(point.x, -10, point.z);
-                this.camera.lookAt(point1.x, -10, point1.z);
+                this.camera.position.set(point.x, -90, point.z);
+                this.camera.lookAt(point1.x, -90, point1.z);
                 var targetPos = point //目标位置点
                 var offsetAngle = 0 //目标移动时的朝向偏移
 

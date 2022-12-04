@@ -107,6 +107,7 @@ const setImage = () => {
     data.imgSrc = image; //赋值并预览图片
     emit('on-photo',image);
 }
+
 // const dataURLtoFile = (dataurl, filename) =>{
 //     var arr = dataurl.split(",");
 //     var mime = arr[0].match(/:(.*?);/)[1];
