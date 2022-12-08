@@ -75,9 +75,10 @@ const query = () => {
                             console.log(res.data);
                         }
                     })
-                router.push({
+                  router.push({
                     path: '/'
-                })
+                })  
+                
             }
             else {
                 alert("用户名或密码错误！");

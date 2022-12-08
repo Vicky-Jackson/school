@@ -28,7 +28,7 @@
 import axios from "axios"
 import { BaiduMap } from 'vue-baidu-map-3x'
 import { onMounted, ref, reactive } from "vue";
-import commonEditor from '../components/editor.vue'
+import commonEditor from '../../components/editor.vue'
 import store from '../store/index'
 import { ElMessage } from 'element-plus'
 
@@ -51,6 +51,7 @@ onMounted(() => {
                 }
             })
         .then(res => {
+            console.log(res)
             if (res.data.length > 0) {
                 res.data.filter(item => {
                     item.startTime = getTime(item.startTime);
@@ -109,6 +110,7 @@ const clickWork = (item) => {
 }
 const releaseWork = () => {
    data.dialog = false;
+   data.detail = store.state.valueHtml;
     const time = new Date();
     const endTime = new Date(data.msg.endTime)
     if (time > endTime) {
@@ -119,7 +121,7 @@ const releaseWork = () => {
         tableName: data.click.tableName,
         s_id: data.click.s_id,
         s_name: store.state.message.name,
-        time: new Date(),
+        time: getTime(new Date()),
         detail:data.detail
     }
     axios
@@ -129,7 +131,6 @@ const releaseWork = () => {
                 alert('提交成功')
             }
         })
-
 }
 </script>
 

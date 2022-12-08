@@ -11,7 +11,8 @@ const routes = [{
         component: () => import("../views/home.vue"),
         meta: {
             title: '首页',
-            keepAlive: true
+            header: true,
+                server: false
         }
 
     },
@@ -21,7 +22,9 @@ const routes = [{
         component: () => import("../views/number.vue"),
         meta: {
             title: '新生数据',
-            keepAlive: true
+             header: true,
+                server: false,
+
         }
     },
     {
@@ -29,7 +32,8 @@ const routes = [{
         name: "login",
         component: () => import("../views/login.vue"),
         meta: {
-            keepAlive: false
+             header: false,
+                server: false
         }
     },
     {
@@ -41,30 +45,33 @@ const routes = [{
         children: [{
                 path: "/signin",
                 name: "signin",
-                component: () => import("../views/signIn.vue"),
+                component: () => import("../views/sign/signIn.vue"),
                 meta: {
                     title: '发布签到',
                     role: ['teacher', 'admin'],
-                    keepAlive: true
+                    header: true,
+                        server: false
                 }
             },
             {
                 path: "/signstudent",
                 name: "signstudent",
-                component: () => import("../views/sign.vue"),
+                component: () => import("../views/sign/sign.vue"),
                 meta: {
                     title: '签到',
                     role: ['student', 'admin'],
-                    keepAlive: true
+                     header: true,
+                    server: false
                 }
             },
             {
                 path: "/signDetail",
                 name: "signsdetail",
-                component: () => import("../views/signDetail.vue"),
+                component: () => import("../views/sign/signDetail.vue"),
                 meta: {
                     role: ['teacher', 'admin'],
-                    keepAlive: true
+                     header: true,
+                        server: false
                 }
             },
         ]
@@ -79,36 +86,43 @@ const routes = [{
         children: [{
                 path: "/students",
                 name: "students",
-                component: () => import("../views/message.vue"),
+                component: () => import("../views/message/message.vue"),
                 meta: {
+                    role: ['teacher', 'admin'],
                     title: '学生信息',
-                    keepAlive: true
+                     header: true,
+                        server: false
                 }
             },
             {
                 path: "/teachers",
                 name: "teachers",
-                component: () => import("../views/teachers.vue"),
+                component: () => import("../views/message/teachers.vue"),
                 meta: {
-                    title: '老师信息',
-                    keepAlive: true
+                    role: ['student', 'admin'],
+                    title: '任课老师信息',
+                     header: true,
+                        server: false
                 }
             },
             {
                 path: "/detail",
                 name: "detail",
-                component: () => import("../views/detail.vue"),
+                component: () => import("../views/message/detail.vue"),
                 meta: {
-                    keepAlive: true
+                     header: true,
+                        server: false
                 }
             },
             {
                 path: "/timetable",
                 name: "timetable",
-                component: () => import("../views/timetable.vue"),
+                component: () => import("../views/message/timetable.vue"),
                 meta: {
+                    role: ['student', 'teacher'],
                     title: "课程表",
-                    keepAlive: true
+                     header: true,
+                        server: false
                 }
             },
         ]
@@ -122,19 +136,34 @@ const routes = [{
         children: [{
                 path: "/scoreTeacher",
                 name: "scoreTeacher",
-                component: () => import("../views/score.vue"),
+                component: () => import("../views/score/score.vue"),
                 meta: {
+                    role: ['teacher', 'admin'],
                     title: '学生成绩',
-                    keepAlive: true
+                    header: true,
+                    server: false
                 }
             },
             {
                 path: "/scorestudent",
                 name: "scorestudent",
-                component: () => import("../views/scoreStudent.vue"),
+                component: () => import("../views/score/scoreStudent.vue"),
                 meta: {
-                    title: '成绩分析',
-                    keepAlive: true
+                    role: ['student', 'admin'],
+                    title: '成绩详情',
+                    header: true,
+                    server: false
+                }
+            },
+            {
+                path: "/scoresadd",
+                name: "scoreadd",
+                component: () => import("../views/score/scoreAdd.vue"),
+                meta: {
+                    role: ['teacher'],
+                    title: '成绩录入',
+                    header: true,
+                    server: false
                 }
             },
         ]
@@ -145,8 +174,77 @@ const routes = [{
         name: "test",
         component: () => import("../views/test.vue"),
         meta: {
-            keepAlive: true
+            header: true,
+            server: false
         }
+    },
+    {
+        path: "/server",
+        name: "server",
+        meta: {
+            title: '后台',
+        },
+        children: [{
+                    path: "/serverhome",
+                    name: "serverhome",
+                    component: () => import("../views/server/home.vue"),
+                    meta: {
+                        role: ['admin'],
+                        header: false,
+                        server: true
+                    }
+                },
+            {
+                path: "/serverStudent",
+                name: "serverStudent",
+                component: () => import("../views/server/student.vue"),
+                meta: {
+                    role: ['admin'],
+                    header: false,
+                    server: true
+                }
+            },
+            {
+                path: "/serverTeacher",
+                name: "serverTeacher",
+                component: () => import("../views/server/teacher.vue"),
+                meta: {
+                    role: ['admin'],
+                    header: false,
+                    server: true
+                }
+            },
+            {
+                path: "/serverscore",
+                name: "serverScore",
+                component: () => import("../views/server/score.vue"),
+                meta: {
+                    role: ['admin'],
+                    header: false,
+                    server: true
+                }
+            },
+            {
+                path: "/serveruser",
+                name: "serverUser",
+                component: () => import("../views/server/user.vue"),
+                meta: {
+                    role: ['admin'],
+                    header: false,
+                    server: true
+                }
+            },
+            {
+                path: "/servercourse",
+                name: "serverCourse",
+                component: () => import("../views/server/course.vue"),
+                meta: {
+                    role: ['admin'],
+                    keepAlive: false,
+                    server: true
+                }
+            },
+        ]
     },
     {
         path: "/work",
@@ -157,7 +255,7 @@ const routes = [{
         children: [{
                 path: "/workstudent",
                 name: "workstudent",
-                component: () => import("../views/work.vue"),
+                component: () => import("../views/work/work.vue"),
                 meta: {
                     title: '作业',
                     role: ['student', 'admin'],
@@ -167,7 +265,7 @@ const routes = [{
             {
                 path: "/releasework",
                 name: "releasework",
-                component: () => import("../views/releaseWork.vue"),
+                component: () => import("../views/work/releaseWork.vue"),
                 meta: {
                     title: '发布作业',
                     role: ['teacher', 'admin'],
@@ -177,7 +275,7 @@ const routes = [{
             {
                 path: "/workDetail",
                 name: "workDetail",
-                component: () => import("../views/workDetail.vue"),
+                component: () => import("../views/work/workDetail.vue"),
                 meta: {
                     role: ['teacher', 'admin'],
                     keepAlive: true
@@ -185,6 +283,7 @@ const routes = [{
             },
         ]
     },
+    
     {
         path: "/404",
         name: "error",
@@ -219,18 +318,17 @@ router.beforeEach((to, from, next) => {
         const constRoutes = []
         routes.filter(item => {
             let child = []
-            if (item.children){
+            if (item.meta?.role?.includes(role) || !item.meta?.role){
+                if (item.children){
                     item.children.filter(res => {
                         if (res.meta?.role?.includes(role) || !res.meta?.role) {
                                 child.push(res);
-                    }
-                })
-                item.children = child;
-                constRoutes.push(item);
-            }
-                
-            else {
-                if (item.meta?.role?.includes(role) || !item.meta?.role) {
+                        }
+                    })
+                    item.children = child;
+                    constRoutes.push(item);
+                }
+                else{
                     constRoutes.push(item);
                 }
             }

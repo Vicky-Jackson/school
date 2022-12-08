@@ -11,7 +11,18 @@
         </div>
     </el-card>
     <el-dialog v-model="dialogForm">
-
+        <div>
+            <span>班级：{{ message.message.class }}</span>
+        </div>
+        <div>
+            <span>课程：{{ message.message.course_name }}</span>
+        </div>
+        <div>
+            <span>电话：{{ message.message.phone }}</span>
+        </div>
+        <div>
+            <span>邮箱：{{ message.message.phone }}</span>
+        </div>
     </el-dialog>
 </template>
 

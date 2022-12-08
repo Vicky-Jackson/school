@@ -71,7 +71,7 @@ class Home3d {
         });
 
         //监听鼠标点击事件
-        window.addEventListener("click", this.onMouseClick.bind(this))
+        //window.addEventListener("click", this.onMouseClick.bind(this))
     }
     initScene() {
         this.scene = new THREE.Scene();
@@ -90,7 +90,6 @@ class Home3d {
             1000
         );
         this.camera.position.set(0, 80, 100);
-        this.camera.rotation.set(0, -Math.PI / 4, 0);
     }
     initRenderer() {
         this.renderer = new THREE.WebGLRenderer({
@@ -438,25 +437,25 @@ class Home3d {
         this.camera.fov = fov;
         this.camera.updateProjectionMatrix();
     }
-    onMouseClick(event) {
-        var mouse = new THREE.Vector2();
-        var raycaster = new THREE.Raycaster();
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // onMouseClick(event) {
+    //     var mouse = new THREE.Vector2();
+    //     var raycaster = new THREE.Raycaster();
+    //     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    //     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        raycaster.setFromCamera(mouse, this.camera);
-        const intersects = raycaster.intersectObjects(this.scene.children);
-        for (let intersect of intersects) {
-            if (intersect.object.name == "teach") {
-                document.getElementById("teach").show();
-                break;
-            }
-            if (intersect.object.name == "library") {
-                document.getElementById("library").show();
-                break;
-            }
-        }
-    }
+    //     raycaster.setFromCamera(mouse, this.camera);
+    //     const intersects = raycaster.intersectObjects(this.scene.children);
+    //     for (let intersect of intersects) {
+    //         if (intersect.object.name == "teach") {
+    //             document.getElementById("teach").show();
+    //             break;
+    //         }
+    //         if (intersect.object.name == "library") {
+    //             document.getElementById("library").show();
+    //             break;
+    //         }
+    //     }
+    // }
 
 }
 

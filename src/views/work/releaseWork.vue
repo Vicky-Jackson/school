@@ -27,7 +27,7 @@
             </template>
         </el-dialog>
         <div id="card" v-for="o in data.msg" :key="o">
-            <el-card id="card-item">
+            <el-card id="card-item" @click="workDetail(o)">
                 <span>{{o.title}}</span>
                 <div id="time">
                     <span id="time-child">{{ o.startTime}}-{{o.endTime}}</span>
@@ -41,15 +41,16 @@
 import axios from 'axios'
 import { reactive, ref, onMounted } from 'vue'
 import store from '../store'
-
+import { useRouter } from 'vue-router';
 const dialogFormVisible = ref(false)
 const value = ref('')
-
+const router = useRouter();
 const data = reactive({
     workMsg: '',
     msg: [],
     title: '',
-    format: []
+    format: [],
+    message:[]
 })
 const defaultTime = new Date()
 onMounted(() => {
@@ -96,6 +97,28 @@ let getTime = (time)=>{
     }
     return commonTime;
 }
+const workDetail = (item) => {
+    axios
+        .get('/api/user/getWorkStudent', {
+            params: {
+                name: item.tableName
+            }
+        })
+        .then(res => {
+            if (res.data.length > 0) {
+                res.data.filter(item => {
+                    item.time = getTime(item.time)
+                    data.message.push(item);
+                })
+            }
+        })
+    sessionStorage.setItem('work',data.message)
+    store.commit('setWorkStudent', data.message);
+    router.push({
+        name:'workDetail',
+    });
+}
+
 const release = () => {
     if(data.title==''||data.workMsg==''){
         alert('信息未填写完整')

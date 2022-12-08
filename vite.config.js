@@ -30,11 +30,11 @@ export default defineConfig({
            changeOrigin: true, // 在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，解决跨域问题
             rewrite: (path) => path.replace(/^\/baidu/, ""),
          },
-         "/server":{
-            target: 'http://localhost:3000',
-             changeOrigin: true, // 解决跨域
-             rewrite: (path) => path.replace(/^\/server/, ""),
-         }
+        //  "/server":{
+        //     target: 'http://localhost:3000',
+        //      changeOrigin: true, // 解决跨域
+        //      rewrite: (path) => path.replace(/^\/server/, ""),
+        //  }
       },
    },
   plugins: [

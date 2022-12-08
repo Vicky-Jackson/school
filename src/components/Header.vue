@@ -3,10 +3,10 @@
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" background-color="black"
             text-color="#fff" active-text-color="#ffd04b" @select="handleSelect" router>
             <el-icon :size="60" id="icon" color="white">
-                <ArrowLeftBold />
-                <ArrowRightBold />
+                <ArrowLeftBold @click = "goback"/>
             </el-icon>
             <h1>教学管理系统</h1>
+            <el-menu-item index="/serverhome" v-if="role == 'admin'">后台</el-menu-item>
             <el-menu-item index="/">首页</el-menu-item>
             <el-sub-menu index="2">
                 <template #title>签到</template>
@@ -45,7 +45,6 @@
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
-
             </div>
 
         </el-menu>
@@ -64,7 +63,7 @@ const activeIndex = ref('/')
 const handleSelect = (key, keyPath) => {
     console.log(key, keyPath)
 }
-const imgText = store.state.message?.name || store.state.userInfo.username;
+const imgText = store.state.message?.name || store.state.message?.s_name||store.state.userInfo.username;
 const role = store.state.userInfo.role
 const Roleroutes = store.state.constRoutes;
 
@@ -103,6 +102,20 @@ const clickQuit = () => {
     store.commit('setMessage', {});
     router.push('/login')
 }
+const goback = ()=>{
+    if (window.history.length <= 1) {
+        router.push({ path: "/" });
+        return;
+    } else {
+        router.go(-1);
+    }
+
+}
+
+const clickBack= ()=>{
+    window.location.href ="http://10.3.81.111:3000/"
+    
+}
 </script>
 
 <style lang="less" scoped>
@@ -124,11 +137,14 @@ const clickQuit = () => {
     #avatar {
         padding: 5px;
         position: relative;
-        left: 400px;
+        left: 350px;
         .el-avatar {
             background-color: rgba(0, 13, 255, 0.669);
             cursor: pointer;
         }
     }
+}
+#icon{
+    cursor: pointer;
 }
 </style>

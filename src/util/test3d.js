@@ -18,7 +18,7 @@ import {
 } from "gsap";
 
 class test3d {
-    constructor(selector, onFinish) {
+    constructor(selector,course) {
         this.container = document.querySelector(selector);
         this.camera;
         this.group;
@@ -30,13 +30,10 @@ class test3d {
         this.selectObject;
         this.animateAction;
         this.clock = new THREE.Clock();
-        this.onFinish = onFinish;
         this.init();
         this.animate();
+        this.course=course;
         this.progressFn;
-    }
-    onProgress(fn) {
-        this.progressFn = fn;
     }
     //初始化
     init() {
@@ -123,7 +120,7 @@ class test3d {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
     }
-    initSprite() {
+    initSprite(textCourse) {
             var canvas = document.createElement('canvas');
             var context = canvas.getContext('2d');
             //canvas 实体
@@ -133,7 +130,7 @@ class test3d {
             //canvas 文字
             context.fillStyle = "black";
             context.font = "24px bold Arial";
-            context.fillText("Math", 30, 30);
+            context.fillText(textCourse, 30, 30);
 
             //生成图片
             let url = canvas.toDataURL('image/png');
@@ -159,15 +156,20 @@ class test3d {
         let loader = new GLTFLoader();
         loader.setDRACOLoader(this.dracoLoader);
         loader.load("./texture/timetable/timetable.gltf", (gltf) => {
-            gltf.scene.position.set(0, 0, 0);
-            console.log(gltf.scene.getObjectByName('课程12')); 
-            const x = gltf.scene.getObjectByName('课程11').position.x;
-            const y = gltf.scene.getObjectByName('课程11').position.y;
-            const z = gltf.scene.getObjectByName('课程11').position.z;
-            var mesh = this.initSprite();
-            mesh.position.set(x+1,y+0.1,z-0.8)
-            mesh.rotation.set(-Math.PI / 2,0 , Math.PI / 2)
-            gltf.scene.add(mesh);
+            gltf.scene.rotation.set(0, 0, -Math.PI / 12);
+             gltf.scene.scale.set(0.9,0.9,0.9)
+             gltf.scene.position.set(0.85,0, 1)
+            this.course.filter(item=>{
+                const text = '课程'+ item.time;
+                const x = gltf.scene.getObjectByName(text).position.x;
+                const y = gltf.scene.getObjectByName(text).position.y;
+                const z = gltf.scene.getObjectByName(text).position.z;
+                var mesh = this.initSprite(item.course_name);
+                mesh.position.set(x+1,y+0.1,z-0.8)
+                mesh.rotation.set(-Math.PI / 2,0 , Math.PI / 2)
+                gltf.scene.add(mesh);
+                console.log(gltf.scene);
+            })
             this.scene.add(gltf.scene);
 
         }, (e) => {

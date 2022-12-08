@@ -24,7 +24,7 @@
 
 <script setup>
 import Home3d from '../util/Home3d'
-import Base3d from '../components/base3d.vue'
+
 import { Icon } from '@iconify/vue';
 import {
     reactive, onMounted,ref
@@ -32,6 +32,8 @@ import {
 import { RouterLink } from "vue-router";
 import Loading from '../components/Loading.vue';
 import { Vue3SeamlessScroll } from "vue3-seamless-scroll"
+import axios from 'axios';
+import store from '../store';
 
 const value = ref(new Date());
 
@@ -40,6 +42,7 @@ const data = reactive({
     progress: 0,
     isLoading: true,
     move: false,
+    course:[],
     option_line: {
         title: { text: "浏览量" },
         xAxis: {
@@ -95,6 +98,16 @@ onMounted(() => {
         progressNum = progressNum.toFixed(2) * 100;
         data.progress = progressNum;
     })
+    // axios.get('/api/user/getCourseStudent',{
+    //     params:{
+    //         role:store.state.userInfo.role,
+    //         id:store.state.userInfo.no
+    //     }
+    // }).then(res=>{
+    //     if(res.data.length > 0){
+    //         data.course = res.data;
+    //     }
+    // })
 })
 const btn = () => {
     document.getElementById("teach").close();

@@ -5,6 +5,7 @@ module.exports = {
         getUser: "select * from users where username = ? and password = ?",
         getMessage: "select * from loginall where id = ?",
         getStudents: "select * from students",
+        getCourseStudents: "select * from coursedetail",
         getTeachers: "select * from teachers",
         getSign:"select * from releaseSign where t_id = ?",
         getSignin: "select * from signdetail where s_id = ?",

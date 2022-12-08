@@ -9,7 +9,9 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 
+
 const app = createApp(App);
+
 
 NProgress.configure({
     easing: 'ease', // 动画方式 

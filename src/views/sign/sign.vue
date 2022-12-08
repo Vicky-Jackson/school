@@ -67,9 +67,9 @@
 import axios from "axios"
 import { BaiduMap } from 'vue-baidu-map-3x'
 import { onMounted, ref, reactive } from "vue";
-import Photo from '../components/photo.vue'
-import commonMap from '../components/map.vue'
-import store from '../store/index'
+import Photo from '../../components/photo.vue'
+import commonMap from '../../components/map.vue'
+import store from '../../store/index'
 import { ElMessage } from 'element-plus'
 
 const data = reactive({
@@ -173,7 +173,7 @@ const releaseSign = () => {
             return;
         }
     }
-    data.dialog.filter(item => item = false);
+    data.dialog = data.dialog.filter(item => item = false);
     const time = new Date();
     const endTime = new Date(data.msg.endTime)
     if (time > endTime) {
@@ -184,7 +184,7 @@ const releaseSign = () => {
         tableName: data.click.tableName,
         s_id: data.click.s_id,
         s_name:store.state.message.name,
-        time: new Date(),
+        time: getTime(new Date()),
         address: data.address,
         photo: data.image
     }
@@ -193,6 +193,8 @@ const releaseSign = () => {
         .then(res => {
             if (res.status === 200) {
                 alert('签到成功')
+                data.address=''
+                data.image=''
             }
         })
 
@@ -225,7 +227,7 @@ const releaseSign = () => {
 }
 #sign{
     width:100%;
-    height: 100vh;
+    min-height: 100vh;
     background-color: black;
 }
 </style>

@@ -111,7 +111,7 @@ router.post('/createSign', (req, res) => {
     let params = req.body;
     console.log(params);
     let sql = 'create table ' + params.name +
-        '(id int  auto_increment not null primary key,s_id varchar(255) not null,s_name varchar(255) not null,time datetime not null,address varchar(255),photo longtext)';
+        '(id int  auto_increment not null primary key,s_id varchar(255) not null,s_name varchar(255) CHARACTER SET utf8mb4 NOT NULL,time datetime not null,address varchar(255) CHARACTER SET utf8mb4 NOT NULL,photo longtext)';
     sql.replace(/[\\"']/g, "");
     conn.query(sql, (err, result) => {
         if (err) {
@@ -140,7 +140,7 @@ router.post('/addSign', (req, res) => {
 router.post('/addSignin', (req, res) => {
     var params = req.body;
     console.log(params);
-    var sql = ("insert into" + params.tableName).replace(/[\\"']/g, "") + '(s_id,time,address,photo) values(?,?,?,?)';
+    var sql = ("insert into " + params.tableName).replace(/[\\"']/g, "") + '(s_id,s_name,time,address,photo) values(?,?,?,?,?)';
 
     // ! [params.username, params.age] 自动填充到之前 ？ 里面
     conn.query(sql, [params.s_id, params.s_name, params.time, params.address, params.photo], (err, result) => {
@@ -184,7 +184,7 @@ router.get('/getSign', (req, res) => {
 
 router.get('/getSignin', (req, res) => {
     let sql = $sql.user.getSignin;
-    let params = req.body;
+    let params = req.query;
     console.log(params);
 
     conn.query(sql, [params.id], (err, result) => {
@@ -200,8 +200,8 @@ router.get('/getSignin', (req, res) => {
 router.post('/createWork', (req, res) => {
     let params = req.body;
     console.log(params);
-    let sql = 'create table ' + params.name +
-        '(id int  auto_increment not null primary key,s_id varchar(255) not null,s_name varchar(255) not null,time datetime not null,detail longtext)';
+    let sql = 'create table ' + params.name + 
+        '(id int  auto_increment not null primary key,s_id varchar(255) not null,s_name varchar(255) CHARACTER SET utf8mb4 NOT NULL,time datetime not null,detail longtext CHARACTER SET utf8mb4 NOT NULL)';
     sql.replace(/[\\"']/g, "");
     conn.query(sql, (err, result) => {
         if (err) {
@@ -230,7 +230,7 @@ router.post('/addWork', (req, res) => {
 router.post('/addWorkin', (req, res) => {
     var params = req.body;
     console.log(params);
-    var sql = ("insert into" + params.tableName).replace(/[\\"']/g, "") + '(s_id,s_name,time,detail) values(?,?,?,?)';
+    var sql = ("insert into " + params.tableName).replace(/[\\"']/g, "") + '(s_id,s_name,time,detail) values(?,?,?,?)';
 
     // ! [params.username, params.age] 自动填充到之前 ？ 里面
     conn.query(sql, [params.s_id, params.s_name, params.time, params.detail], (err, result) => {
@@ -248,6 +248,7 @@ router.get('/getWorkStudent', (req, res) => {
     if (params.id)
         sql += ' where s_id = "' + params.id + '"';
     console.log(params);
+    console.log(sql)
     conn.query(sql, (err, result) => {
         if (err)
             console.log(err);
@@ -301,13 +302,13 @@ router.get('/getAnouncement', (req, res) => {
 });
 
 router.get('/getScore', (req, res) => {
-    let sql = $sql.user.getAnouncement;
+    let sql = $sql.user.getScore;
     let params = req.query;
     console.log(params);
     if (params.t_id)
-        sql += 'where t_id = ' + params.t_id;
+        sql += ' where t_id = "' + params.t_id + '"';
     else if (params.s_id)
-        sql += 'where s_id = ' + params.s_id;
+        sql += ' where s_id = "' + params.s_id+'"';
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -338,7 +339,7 @@ const upload = multer({
             let ex_name = file.originalname.split('.')[0]
             console.log(ex_name)
             //防止文件名重复，为文件名加上时间戳
-            let fileName = ex_name + '-' + path.extname(file.originalname);
+            let fileName = ex_name + '-' + Date.now() + '-' + path.extname(file.originalname);
             //fileName就是上传文件的文件名
             cb(null, fileName);
         }
@@ -356,40 +357,24 @@ router.post('/upload', upload.single('file'),(req, res) => {
         }]
     })
 });
-// var form = new formidable.IncomingForm();
-//   //设置文件上传存放地址
-//   form.uploadDir = "./public/image";
-//   //执行里面的回调函数的时候，表单已经全部接收完毕了。
-//   form.parse(req, function (err, fields, files) {
-//     console.log(files);
-//   var oldpath = files.path;
-//   var extname = files.name;
-//       //新的路径由三个部分组成：时间戳、随机数、拓展名
-//       var newpath = "./public/image/" + extname;
-//        console.log(oldpath, newpath);
-//       //改名
-//       try {
 
-//           fs.rename(oldpath, newpath, function (err) {
-//               if (err) {
-//                   res.json({
-//                       errno: 1,
-//                       data: []
-//                   });
-//               };
-//               var mypath = newpath.replace("./public", "http://localhost:5173");
-//               req.session.makeUp_imgPath = mypath;
-//               res.json({
-//                   errno: 0,
-//                   data: [mypath]
-//               })
-//           });
-//       } catch (ex) {
-//           //fs.unlink(newpath)
-//           res.json({
-//               errno: 1,
-//               data: ex
-//           })
-//       }
-//});
+router.get('/getCourseStudent', (req, res) => {
+    let sql = $sql.user.getCourseStudents;
+    let params = req.query;
+    console.log(params);
+    if(params.role == 'teacher'){
+        sql+=' where t_id = "' + params.id + '"'
+    }
+    else if(params.role == 'student'){
+        sql += ' where s_id = "' + params.id + '"'
+    }
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
 module.exports = router;

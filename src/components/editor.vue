@@ -3,7 +3,7 @@
         <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
             :mode="mode" />
         <Editor style="height: 300px;  overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig"
-            :mode="mode" @onCreated="handleCreated" />
+            :mode="mode" @onCreated="handleCreated" @onChange="handleChange" />
     </div>
 </template>
 <script setup>
@@ -12,6 +12,8 @@ import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import axios from 'axios'
+import { DomEditor } from '@wangeditor/editor'
+import store from '../store'
 
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
@@ -26,7 +28,20 @@ onMounted(() => {
 
 })
 
+const handleChange = ()=>{
+    store.commit('setValueHtml',valueHtml.value);
+}
 const toolbarConfig = {}
+
+toolbarConfig.excludeKeys = [
+    'bgColor',
+    'todo',
+    'emotion',
+    'insertLink',
+    'group-video',
+    'codeBlock',
+    'insertImage'
+]
 const editorConfig = {
     placeholder: '请输入内容...',
     MENU_CONF: {},
@@ -42,7 +57,7 @@ onBeforeUnmount(() => {
 const handleCreated = (editor) => {
     editorRef.value = editor // 记录 editor 实例，重要！
 }
-
+//上传图片
 editorConfig.MENU_CONF['uploadImage'] = {
     server: '/api/user/upload',
     // server: '/api/upload-img-10s', // test timeout
@@ -85,9 +100,9 @@ editorConfig.MENU_CONF['uploadImage'] = {
         let href = imgInfo.imgPath
         if (!url) throw new Error(`Image url is empty`)
         console.log('Your image url ', url)
-        url = 'http://10.3.81.111:5173/'+ url;
+        url = 'http://10.3.81.111:5173/public/image/'+ url;
         console.log(url);
-        insertFn(href,url)
+        insertFn(url,href)
     },
 }
 

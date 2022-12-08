@@ -17,8 +17,8 @@
 <script setup>
 import axios from "axios";
 import { reactive, ref, onMounted } from "vue";
-import store from "../store/index";
-import commonEcharts from '../components/echarts.vue'
+import store from "../../store/index";
+import commonEcharts from '../../components/echarts.vue'
 const option_pie = {
     title: { text: "Pie Chart" },
     tooltip: {},
@@ -114,7 +114,7 @@ onMounted(() => {
 <style lang="less" scoped>
 #score {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     background-color: black;
 }
 .tableClass{

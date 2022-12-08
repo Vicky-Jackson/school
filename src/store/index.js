@@ -5,7 +5,10 @@ const store = createStore({
          userInfo: (sessionStorage.getItem('loginData') && JSON.parse(sessionStorage.getItem('loginData'))) || {},
          message: (sessionStorage.getItem('message') && JSON.parse(sessionStorage.getItem('message'))) || {},
          constRoutes: sessionStorage.getItem('routes') || [],
-         signStudent:[]
+         signStudent: sessionStorage.getItem('sign') || [],
+         workStudent: sessionStorage.getItem('work') || [],
+         course: sessionStorage.getItem('course') || [],
+         valueHtml:''
     },
     mutations:{
         setUserInfo(state, uInfo) {
@@ -19,6 +22,15 @@ const store = createStore({
         },
         setSignStudent(state, signStudent) {
             state.signStudent = signStudent
+        },
+        setWorkStudent(state, workStudent) {
+            state.workStudent = workStudent
+        },
+        setCourse(state, course) {
+            state.course = course
+        },
+        setValueHtml(state, valueHtml) {
+            state.valueHtml = valueHtml
         }
     },
     actions:{},

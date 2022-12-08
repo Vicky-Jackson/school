@@ -50,7 +50,7 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import axios from "axios"
-import store from '../store/index.js'
+import store from '../../store/index.js'
 import { useRouter } from 'vue-router'
 
 const router = useRouter();
@@ -62,7 +62,8 @@ const data = reactive({
     pass: '',
     msg: [],
     format: [],
-    tableName: ''
+    tableName: '',
+    message:[]
 })
 
 onMounted(() => {
@@ -111,22 +112,26 @@ let getTime = (time) => {
     return commonTime;
 }
 const clickCard = (item) => {
-    let message = [];
     axios
-        .get('/api/user/getSignStudent',{
-            params:{
-                name:item.tableName
+        .get('/api/user/getSignStudent', {
+            params: {
+                name: item.tableName
             }
         })
-        .then(res=>{
-            if(res.data.length > 0){
+        .then(res => {
+            if (res.data.length > 0) {
                 res.data.filter(item => {
-                    message.push(item);
+                    item.time = getTime(item.time)
+                    data.message.push(item);
                 })
             }
         })
-    store.commit('setSignStudent',message);
-    router.push('/signDetail');
+    console.log(data.message)
+    sessionStorage.setItem('sign', data.message)
+    store.commit('setSignStudent', data.message);
+    router.push({ 
+        path: '/signDetail'
+    });
 }
 const releaseSign = () => {
     if (radio.value == "验证码签到") {
@@ -166,13 +171,13 @@ const releaseSign = () => {
                 console.log('添加成功')
             }
         })
-    data.pass='';
+    data.pass = '';
 }
 </script>
 
 <style lang="less" scoped>
 #sign {
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
     background-color: black;
 

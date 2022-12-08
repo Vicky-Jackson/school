@@ -13,9 +13,8 @@
 </template>
 
 <script setup>
-import Card3d from '../util/Card3d'
 import { reactive, onMounted, inject } from "vue";
-import store from '../store/index.js';
+import store from '../../store/index.js';
 
 const message = store.state.message;
 

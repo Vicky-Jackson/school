@@ -13,8 +13,8 @@
 <script setup>
 import axios from "axios";
 import { reactive, ref, onMounted } from "vue";
-import store from "../store/index";
-import commonEcharts from '../components/echarts.vue'
+import store from "../../store/index";
+import commonEcharts from '../../components/echarts.vue'
 
 const tableData = [
     {
@@ -58,18 +58,18 @@ const data = reactive({
     msg: []
 })
 onMounted(() => {
-    // axios
-    //     .get('/api/user/getScore', {
-    //         params: {
-    //             s_id:store.state.userInfo.no,
-    //         }
-    //     })
-    //     .then(res=>{
-    //         if(res.data.length>0)
-    //             res.data.filter(item=>{
-    //                 data.msg.push(item);
-    //             })
-    //     })
+    axios
+        .get('/api/user/getScore', {
+            params: {
+                s_id:store.state.userInfo.no,
+            }
+        })
+        .then(res=>{
+            if(res.data.length>0)
+                res.data.filter(item=>{
+                    data.msg.push(item);
+                })
+        })
 
 })
 </script>
@@ -77,7 +77,7 @@ onMounted(() => {
 <style lang="less" scoped>
 #score {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     background-color: black;
 }
 
