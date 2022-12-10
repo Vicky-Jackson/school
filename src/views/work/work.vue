@@ -29,7 +29,7 @@ import axios from "axios"
 import { BaiduMap } from 'vue-baidu-map-3x'
 import { onMounted, ref, reactive } from "vue";
 import commonEditor from '../../components/editor.vue'
-import store from '../store/index'
+import store from '../../store/index'
 import { ElMessage } from 'element-plus'
 
 const data = reactive({

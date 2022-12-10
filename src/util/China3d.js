@@ -232,7 +232,7 @@ class China3d {
         if (this.lastPick) {
             const properties = this.lastPick.object.parent.properties
 
-            this.tooltip.textContent = properties.name
+            this.tooltip.textContent = properties.name + ":" + properties.number+"人"
 
             this.tooltip.style.visibility = 'visible'
         } else {

@@ -11,6 +11,9 @@
     <div id="echarts">
         <echarts></echarts>
     </div>
+    <div>
+        <h1 id="number-title">总人数：1112人</h1>
+    </div>
 </template>
 
 <script setup>
@@ -58,5 +61,10 @@ onMounted(() => {
     position:absolute; 
     top:60px;
 }
-
+#number-title{
+    color:rgb(15, 49, 110);
+    position:absolute;
+    top:190px;
+    left:500px
+}
 </style>

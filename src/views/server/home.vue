@@ -1,24 +1,62 @@
 <template>
 <div id="home">
     <el-card :body-style="{ padding: '0px' }">
-        <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+        <img src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
             class="image" />
         <div style="padding: 14px">
             <div >角色：admin</div>
             <div class="bottom">
                 <time class="time">{{ currentDate }}</time>
-                <el-button text class="button">Operating</el-button>
             </div>
         </div>
-    </el-card>
+    </el-card>  
+    <div id="collapse">
+        <strong style="padding:2px;font-size:20px">公告</strong>
+        <el-collapse v-model="activeName" accordion="true" style="padding:5px">
+            <el-collapse-item v-for="item in data.msg" :key="item.id" :title="item.title" :name="item.id">
+                <div>{{item.detail}}</div>
+                <div id="coltime">{{item.time.substr(0,10)}}</div>
+            </el-collapse-item>
+        </el-collapse>
+    </div>
+    <div id="line">
+        <v-charts :option="data.option_line" style="height: 300px; width:100%;"></v-charts>
+    </div>
 </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import axios from 'axios'
+import { onMounted, reactive, ref } from 'vue'
 
 const currentDate = ref(new Date())
-
+const activeName = ref('1')
+const data = reactive({
+    msg:[],
+    option_line: {
+        title: { text: "浏览量" },
+        xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                data: [150, 230, 224, 218, 135, 147, 260],
+                type: 'line'
+            }
+        ]
+    }
+})
+onMounted(()=>{
+    axios.get('/api/user/getAnouncement').then(res=>{
+        if(res.data.length>0){
+            data.msg = res.data;
+        }
+    })
+})
 </script>
 
 <style lang="less" scoped>
@@ -43,9 +81,24 @@ const currentDate = ref(new Date())
     justify-content: space-between;
     align-items: center;
 }
-
+#line{
+    padding: 10px;
+}
 .button {
     padding: 0;
     min-height: auto;
+}
+#collapse{
+    width: 400px;
+    height:200px;
+    position:absolute;
+    top:80px;
+    left:67%;
+    border: 1px solid rgb(42, 41, 41);
+    overflow: scroll;
+}
+#coltime{
+    font-size: 12px;
+    color: #999;
 }
 </style>

@@ -21,33 +21,6 @@ var jsonWrite = (res, ret) => {
         res.json(ret);
     }
 };
-// 增加用户接口
-// POST 请求
-// router.post('/addUser', (req, res) => {
-//     var sql = $sql.user.add;
-//     var params = req.body;
-//     console.log(params);
-//     // ! [params.username, params.age] 自动填充到之前 ？ 里面
-//     conn.query(sql, [params.id, params.name, params.age], (err, result) => {
-//         if (err) return console.log(err);
-//         if (result) {
-//             jsonWrite(res, result);
-//         }
-//     });
-// });
-// GET 请求
-// router.get('/getUser', (req, res) => {
-//     let sql = $sql.user.get;
-//     let params = req.query;
-//     console.log(params);
-//     conn.query(sql, (err, result) => {
-//         if (err) {
-//             console.log(err);
-//         }
-//         console.log(res, result);
-//     });
-// });
-// module.exports = router;
 
 router.post('/getUser', (req, res) => {
     let sql = $sql.user.getUser;
@@ -55,6 +28,60 @@ router.post('/getUser', (req, res) => {
     console.log(params);
 
     conn.query(sql, [params.username, params.password], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getUserall', (req, res) => {
+    let sql = $sql.user.getUserall;
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/removeUser', (req, res) => {
+    let sql = $sql.user.removeUser;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.username],(err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addUser', (req, res) => {
+    let sql = $sql.user.addUser;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.username,params.password,params.no,params.role], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/editUser', (req, res) => {
+    let sql = $sql.user.editUser;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.username, params.password, params.role,params.no], (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -93,11 +120,95 @@ router.get('/getStudents', (req, res) => {
     });
 });
 
+router.post('/removeStudent', (req, res) => {
+    let sql = $sql.user.removeStudent;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.s_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addStudent', (req, res) => {
+    let sql = $sql.user.addStudent;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.s_id, params.s_name, params.sex, params.phone, params.email, params.address, params.class], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/editStudent', (req, res) => {
+    let sql = $sql.user.editStudent;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.s_name, params.sex, params.phone, params.email, params.address, params.class, params.s_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
 router.get('/getTeachers', (req, res) => {
     let sql = $sql.user.getTeachers;
     let params = req.body;
     console.log(params);
     conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/removeTeacher', (req, res) => {
+    let sql = $sql.user.removeTeacher;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.t_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addTeacher', (req, res) => {
+    let sql = $sql.user.addTeacher;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.t_id, params.name, params.sex, params.phone, params.email, params.address], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/editTeacher', (req, res) => {
+    let sql = $sql.user.editTeacher;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.name, params.sex, params.phone, params.email, params.address, params.t_id], (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -200,7 +311,7 @@ router.get('/getSignin', (req, res) => {
 router.post('/createWork', (req, res) => {
     let params = req.body;
     console.log(params);
-    let sql = 'create table ' + params.name + 
+    let sql = 'create table ' + params.name +
         '(id int  auto_increment not null primary key,s_id varchar(255) not null,s_name varchar(255) CHARACTER SET utf8mb4 NOT NULL,time datetime not null,detail longtext CHARACTER SET utf8mb4 NOT NULL)';
     sql.replace(/[\\"']/g, "");
     conn.query(sql, (err, result) => {
@@ -286,12 +397,27 @@ router.get('/getWork', (req, res) => {
         }
     });
 });
+
 router.get('/getAnouncement', (req, res) => {
     let sql = $sql.user.getAnouncement;
     let params = req.query;
     console.log(params);
 
     conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addAnouncement', (req, res) => {
+    let sql = $sql.user.addAnouncement;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.title, params.detail, new Date()], (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -308,7 +434,7 @@ router.get('/getScore', (req, res) => {
     if (params.t_id)
         sql += ' where t_id = "' + params.t_id + '"';
     else if (params.s_id)
-        sql += ' where s_id = "' + params.s_id+'"';
+        sql += ' where s_id = "' + params.s_id + '"';
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -318,6 +444,47 @@ router.get('/getScore', (req, res) => {
         }
     });
 });
+router.post('/removeScore', (req, res) => {
+    let sql = $sql.user.removeScore;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.s_id,params.c_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addScore', (req, res) => {
+    let sql = $sql.user.addScore;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.s_id, params.c_id, params.score], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+router.post('/updateScore', (req, res) => {
+    let sql = $sql.user.updateScore;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.score, params.s_id, params.c_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
 
 const upload = multer({
     storage: multer.diskStorage({
@@ -346,7 +513,7 @@ const upload = multer({
     })
 })
 
-router.post('/upload', upload.single('file'),(req, res) => {
+router.post('/upload', upload.single('file'), (req, res) => {
     console.log(req.file)
     res.send({
         error: 0,
@@ -362,13 +529,66 @@ router.get('/getCourseStudent', (req, res) => {
     let sql = $sql.user.getCourseStudents;
     let params = req.query;
     console.log(params);
-    if(params.role == 'teacher'){
-        sql+=' where t_id = "' + params.id + '"'
-    }
-    else if(params.role == 'student'){
+    if (params.role == 'teacher') {
+        sql += ' where t_id = "' + params.id + '"'
+    } else if (params.role == 'student') {
         sql += ' where s_id = "' + params.id + '"'
     }
     conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/getCourse', (req, res) => {
+    let sql = $sql.user.getCourse;
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/removeCourse', (req, res) => {
+    let sql = $sql.user.removeCourse;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.c_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/addCourse', (req, res) => {
+    let sql = $sql.user.addCourse;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.c_id, params.course_name, params.t_id, params.time, params.class], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/editCourse', (req, res) => {
+    let sql = $sql.user.editCourse;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.course_name, params.t_id, params.time, params.class,params.c_id], (err, result) => {
         if (err) {
             console.log(err);
         }

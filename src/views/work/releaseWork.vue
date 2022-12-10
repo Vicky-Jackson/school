@@ -40,7 +40,7 @@
 <script setup>
 import axios from 'axios'
 import { reactive, ref, onMounted } from 'vue'
-import store from '../store'
+import store from '../../store'
 import { useRouter } from 'vue-router';
 const dialogFormVisible = ref(false)
 const value = ref('')

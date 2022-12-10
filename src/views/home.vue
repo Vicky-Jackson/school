@@ -11,14 +11,17 @@
                 <v-charts :option="data.option_line" style="height: 250px; width:300px;"></v-charts>
             </div>
         </div>
-        <vue3-seamless-scroll :list="data.listData" class="warp">
+        <vue3-seamless-scroll :list="data.listData" class="warp" hover>
             <ul class="item">
-                <li v-for="(item, index) in data.listData" :key="index">
+                <li v-for="(item, index) in data.listData" :key="index" style="cursor: pointer;" @click="handleClick(item)">
                     <span class="title">{{ item.title }}</span>
-                    <span class="date">{{ item.date }}</span>
+                    <span class="date">{{ item.time.substr(0,10) }}</span>
                 </li>
             </ul>
         </vue3-seamless-scroll>
+        <el-dialog v-model="dialogForm">
+            <div>{{data.click.detail}}</div>
+        </el-dialog>
     </div>
 </template>
 
@@ -36,13 +39,14 @@ import axios from 'axios';
 import store from '../store';
 
 const value = ref(new Date());
-
+const dialogForm = ref(false)
 const data = reactive({
     home3d: {},
     progress: 0,
     isLoading: true,
     move: false,
     course:[],
+    click:[],
     option_line: {
         title: { text: "浏览量" },
         xAxis: {
@@ -59,34 +63,7 @@ const data = reactive({
             }
         ]
     },
-    listData: [{
-        'title': '无缝滚动第一行无缝滚动第一行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第二行无缝滚动第二行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第三行无缝滚动第三行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第四行无缝滚动第四行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第五行无缝滚动第五行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第六行无缝滚动第六行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第七行无缝滚动第七行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第八行无缝滚动第八行',
-        'date': '2017-12-16'
-    }, {
-        'title': '无缝滚动第九行无缝滚动第九行',
-        'date': '2017-12-16'
-    }],
+    listData: [],
 })
 function loadingFinish() {
     data.isLoading = false
@@ -98,24 +75,15 @@ onMounted(() => {
         progressNum = progressNum.toFixed(2) * 100;
         data.progress = progressNum;
     })
-    // axios.get('/api/user/getCourseStudent',{
-    //     params:{
-    //         role:store.state.userInfo.role,
-    //         id:store.state.userInfo.no
-    //     }
-    // }).then(res=>{
-    //     if(res.data.length > 0){
-    //         data.course = res.data;
-    //     }
-    // })
+    axios.get('/api/user/getAnouncement').then(res=>{
+        if(res.data.length > 0){
+            data.listData = res.data;
+        }
+    })
 })
-const btn = () => {
-    document.getElementById("teach").close();
-
-}
-const btn1 = () => {
-
-    document.getElementById("library").close();
+const handleClick = (item)=>{
+    data.click=item;
+    dialogForm.value = true;
 }
 </script>
 

@@ -50,7 +50,7 @@ const routes = [{
                     title: '发布签到',
                     role: ['teacher', 'admin'],
                     header: true,
-                        server: false
+                    server: false
                 }
             },
             {
@@ -240,7 +240,7 @@ const routes = [{
                 component: () => import("../views/server/course.vue"),
                 meta: {
                     role: ['admin'],
-                    keepAlive: false,
+                    header: false,
                     server: true
                 }
             },
@@ -259,7 +259,8 @@ const routes = [{
                 meta: {
                     title: '作业',
                     role: ['student', 'admin'],
-                    keepAlive: true
+                    header: true,
+                    server: false
                 }
             },
             {
@@ -269,7 +270,8 @@ const routes = [{
                 meta: {
                     title: '发布作业',
                     role: ['teacher', 'admin'],
-                    keepAlive: true
+                    header: true,
+                    server: false
                 }
             },
             {
@@ -278,7 +280,8 @@ const routes = [{
                 component: () => import("../views/work/workDetail.vue"),
                 meta: {
                     role: ['teacher', 'admin'],
-                    keepAlive: true
+                    header: true,
+                    server: false
                 }
             },
         ]
@@ -289,7 +292,7 @@ const routes = [{
         name: "error",
         component: () => import("../views/error.vue"),
         meta: {
-            keepAlive: true
+            header: true
         }
     }
 ];

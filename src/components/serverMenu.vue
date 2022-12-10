@@ -8,16 +8,22 @@
                 class="inline-input" placeholder="Please Input" @select="handleSelect" :suffix-icon="Search"
                 :select-when-unmatched="true">
                 <template #default="{ item }">
-                    <div class="value">{{ item.name }}</div>
+                    <div class="value">{{ item.name || item.s_name || item.course_name || item.no}}</div>
                 </template>
             </el-autocomplete>
         </div>
 
     </div>
 
-    <el-table id="exportTab" :data="data.state == '' ? tableData.message : data.message" stripe style="width: 100%" height="450">
+    <el-table id="exportTab" :data="data.state == '' ? tableData.message : data.message" stripe style="width: 100%"
+        height="450">
         <el-table-column type="selection" width="55" />
-        <el-table-column v-for="(o) in data.keys" :key="o" :prop="o" :label=o></el-table-column>
+        <el-table-column v-for="(o) in data.keys" :key="o" :prop="o" :label=o :sortable ="o ==='class' || o==='score'">
+            <template #default="scope">
+                <span v-if="o !=='photo'">{{scope.row[o]}}</span>
+                <img :src=scope.row[o] v-else>
+            </template>
+        </el-table-column>
         <el-table-column fixed="right" label="Operations" width="120">
             <template #default="scope">
                 <el-button link type="primary" size="small" @click="show(scope.$index, scope.row)">
@@ -29,22 +35,39 @@
             </template>
         </el-table-column>
     </el-table>
-   
-    
-    <el-dialog v-model="dialogFormVisible" title="Shipping address">
+
+
+    <el-dialog v-model="dialogFormVisible" title="添加">
         <el-form :model="data">
-            <el-form-item label="name" :label-width="formLabelWidth">
-                <el-input v-model="data.name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Address" :label-width="formLabelWidth">
-                <el-input v-model="data.address" autocomplete="off" />
-            </el-form-item>
+            <div v-for="item in data.keys" :key="item">
+                <el-form-item :label="item" :label-width="formLabelWidth" v-if="item !== 'photo'">
+                    <el-input v-model="data.result[item]" autocomplete="off" />
+                </el-form-item>
+            </div>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">Cancel</el-button>
                 <el-button type="primary" @click="onAdditem">
-                    Confirm
+                    确认添加
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+
+    <el-dialog v-model="dialogForm" title="修改">
+        <el-form :model="data">
+            <div v-for="item in data.keys" :key="item">
+                <el-form-item :label="item" :label-width="formLabelWidth" v-if="item !== 'photo'">
+                    <el-input v-model="data.click[item]" autocomplete="off" :disabled="item.split('_')[1] === 'id' || item.split('_')[0]==='id'"/>
+                </el-form-item>
+            </div>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="onEdititem">
+                    确认修改
                 </el-button>
             </span>
         </template>
@@ -58,39 +81,57 @@ import { Search } from '@element-plus/icons-vue'
 import FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 const dialogFormVisible = ref(false)
+const dialogForm = ref(false)
 const formLabelWidth = '140px'
 const tableData = defineProps({
     message: [],
-    keys:[],
-    remove:'',
-    add:'',
-    edit:'',
-    table:''
+    keys: [],
+    remove: '',
+    add: '',
+    edit: '',
+    table: '',
 })
+
 const data = reactive({
     name: '',
     address: '',
     restaurants: [],
-    message:[],
+    message: [],
     state: '',
+    result: {},
+    keys: [],
+    click:[]
 })
 
 onMounted(() => {
     data.restaurants = tableData.message
     data.keys = tableData.keys
 })
-const deleteRow = (index,row) => {
-    tableData.value.splice(index, 1)
+const deleteRow = (index, row) => {
+    tableData.message.splice(index, 1)
+    axios.post(tableData.remove,row).then(res=>{
+        if(res.status === 200){
+            alert('删除成功')
+        }
+    })
+}
+const onAdditem = () => {
+    tableData.message.push(data.result)
+    dialogFormVisible.value = false;
+    axios.post(tableData.add,data.result).then(res=>{
+        if(res.status===200)
+            alert('添加成功')
+    })
 }
 
-const onAdditem = () => {
-    tableData.value.push({
-        date: '2022-11-10',
-        name: data.name,
-        address: data.address,
+const onEdititem = () => {
+    dialogForm.value = false;
+    axios.post(tableData.edit, data.click).then(res => {
+        if (res.status === 200)
+            alert('修改成功')
     })
-    dialogFormVisible.value = false;
 }
+
 const querySearch = (queryString, cb) => {
     const results = queryString
         ? data.restaurants.filter(createFilter(queryString))
@@ -101,8 +142,9 @@ const querySearch = (queryString, cb) => {
 }
 const createFilter = (queryString) => {
     return (restaurant) => {
+        var result = restaurant.name || restaurant.s_name || restaurant.course_name || restaurant.no
         return (
-            restaurant.name.toLowerCase().indexOf(queryString.toLowerCase()) >= 0
+            result.toLowerCase().indexOf(queryString.toLowerCase()) >= 0
         )
     }
 }
@@ -110,7 +152,9 @@ const handleSelect = (item) => {
     data.state = item.name;
     data.message = [item]
 }
-const show = (index,row)=>{
+const show = (index, row) => {
+    data.click = row
+    dialogForm.value=true
     console.log(row)
 }
 const exportExcel = () => {
@@ -122,7 +166,7 @@ const exportExcel = () => {
     /* get binary string as output */
     var wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' })
     try {
-        FileSaver.saveAs(new Blob([wbout], { type: 'application/octet-stream' }), tableData.table+'.xlsx')
+        FileSaver.saveAs(new Blob([wbout], { type: 'application/octet-stream' }), tableData.table + '.xlsx')
     } catch (e) {
         if (typeof console !== 'undefined') {
             console.log(e, wbout)

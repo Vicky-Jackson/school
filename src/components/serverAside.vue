@@ -27,6 +27,12 @@
                 </el-icon>
                 <span>老师信息管理</span>
             </el-menu-item>
+            <el-menu-item index="/servercourse">
+                <el-icon>
+                    <document />
+                </el-icon>
+                <span>课程信息管理</span>
+            </el-menu-item>
             <el-menu-item index="/serverscore">
                 <el-icon>
                     <setting />
@@ -74,7 +80,7 @@ const handleClose = (key, keyPath) => {
     #title {
         color: rgb(0, 0, 0);
         text-align: center;
-        font-size:25px;
+        font-size:23px;
         font-weight: 900;
         line-height: 50px;
         margin-bottom: 20px

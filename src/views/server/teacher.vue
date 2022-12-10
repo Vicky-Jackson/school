@@ -1,5 +1,5 @@
 <template>
-    <CommonMenu :message="data.msg" :keys="data.keys"></CommonMenu>
+    <CommonMenu :message="data.msg" :keys="data.keys" :remove="data.remove" :add="data.add" :edit="data.edit" :table="data.table"></CommonMenu>
 </template>
 
 <script setup>
@@ -8,9 +8,15 @@ import { reactive,onMounted } from 'vue';
 import  axios  from 'axios';
 const data = reactive({
     msg:[],
-    keys:[]
+    keys:[],
+    add: '',
+    edit: '',
+    table: 'teacher'
 })
 onMounted(()=>{
+    data.remove = '/api/user/removeTeacher'
+    data.add = '/api/user/addTeacher'
+    data.edit = '/api/user/editTeacher'
     axios.get('/api/user/getTeachers').then(res => {
         if (res.data.length > 0) {
             res.data.filter(item => {

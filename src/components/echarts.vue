@@ -17,11 +17,11 @@ const option_pie = {
             type: 'pie',
             data: [
                 {
-                    value: 335,
+                    value: 600,
                     name: '男'
                 },
                 {
-                    value: 234,
+                    value: 512,
                     name: '女'
                 },
             ]
@@ -29,17 +29,17 @@ const option_pie = {
     ],
 }
 const option_bar = {
-    title: { text: "Column Chart" },
+    title: { text: "各年级人数" },
     tooltip: {},
     xAxis: {
-        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+        data: ["高一","高二","高三"],
     },
     yAxis: {},
     series: [
         {
-            name: "销量",
+            name: "人数",
             type: "bar",
-            data: [5, 20, 36, 10, 10, 20],
+            data: [350,400,362],
         },
     ],
 }

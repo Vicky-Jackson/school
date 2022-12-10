@@ -5,10 +5,12 @@
             <v-charts :option="option_bar" style="height: 250px; width:400px;float:right"></v-charts>
         </div>
         <div class="tableClass"> 
-            <el-table :data="tableData" height="250" border style="width: 90%; margin-left:50px" :row-style="rowState">
-                <el-table-column prop="date" label="Date" width="180" />
-                <el-table-column prop="name" label="Name" width="180" />
-                <el-table-column prop="address" label="Address" />
+            <el-table :data="data.msg" height="250" border style="width: 90%; margin-left:50px" :row-style="rowState">
+                <el-table-column prop="c_id" label="课程id" width="180" />
+                <el-table-column prop="course_name" label="课程名" width="180" />
+                <el-table-column prop="s_id" label="学生id" width="180" />、
+                <el-table-column prop="s_name" label="学生姓名" width="180" />
+                <el-table-column prop="score" label="成绩" />
             </el-table>
         </div>
     </div>
@@ -19,95 +21,86 @@ import axios from "axios";
 import { reactive, ref, onMounted } from "vue";
 import store from "../../store/index";
 import commonEcharts from '../../components/echarts.vue'
+
+const data = reactive({
+    msg: [],
+    pieData: [
+        {
+            value: 0,
+            name: "及格"
+        },
+        {
+            value: 0,
+            name: "不及格"
+        }
+    ],
+    barData:[0,0,0,0,0]
+})
 const option_pie = {
-    title: { text: "Pie Chart" },
+    title: { text: "及格率" },
     tooltip: {},
     series: [
         {
             type: 'pie',
-            data: [
-                {
-                    value: 335,
-                    name: '男'
-                },
-                {
-                    value: 234,
-                    name: '女'
-                },
-            ]
+            data: data.pieData
         },
     ],
 }
 const option_bar = {
-    title: { text: "Column Chart" },
+    title: { text: "各分数段学生" },
     tooltip: {},
     xAxis: {
-        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+        data: [">90", "80-90", "70-80", "60-70", "<60"],
     },
     yAxis: {},
     series: [
         {
-            name: "销量",
+            name: "人数",
             type: "bar",
-            data: [5, 20, 36, 10, 10, 20],
+            data: data.barData
         },
     ],
 }
-const tableData = [
-    {
-        date: '2016-05-03',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-02',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-04',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-01',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-01',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-01',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-]
 const rowState = (arg) => {
     return {
         backgroundColor: 'rgba(36, 102, 208)',
         color: 'rgba(179, 223, 17)',
     }
 }
-const data = reactive({
-    msg: []
-})
-onMounted(() => {
-    // axios
-    //     .get('/api/user/getScore', {
-    //         params: {
-    //             t_id:store.state.userInfo.no,
-    //         }
-    //     })
-    //     .then(res=>{
-    //         if(res.data.length>0)
-    //             res.data.filter(item=>{
-    //                 data.msg.push(item);
-    //             })
-    //     })
 
+onMounted(() => {
+    axios
+        .get('/api/user/getScore', {
+            params: {
+                t_id:store.state.userInfo.no,
+            }
+        })
+        .then(res=>{
+            if(res.data.length>0)
+                res.data.filter(item=>{
+                    if(item.score > 90){
+                        data.barData[0]++;
+                        data.pieData[0].value++;
+                    }
+                    else if(item.score <=90 && item.score >80){
+                        data.barData[1]++;
+                        data.pieData[0].value++;
+                    }
+                    else if (item.score <= 80 && item.score > 70) {
+                        data.barData[2]++;
+                        data.pieData[0].value++;
+                    }
+                    else if (item.score > 60 && item.score <= 70){
+                        data.barData[3]++;
+                        data.pieData[0].value++;
+                    }
+                    else{
+                        data.barData[4]++;
+                        data.pieData[1].value++;
+                    }
+                    data.msg.push(item);
+                })
+        })
 })
 </script>
 
