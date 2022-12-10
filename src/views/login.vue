@@ -65,7 +65,7 @@ const query = () => {
                 axios
                     .get('/api/user/getMessage', {
                         params: {
-                            id: store.state.userInfo.no
+                            id: store.state.userInfo.username
                         }
                     })
                     .then(res => {

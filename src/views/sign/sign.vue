@@ -87,7 +87,7 @@ onMounted(() => {
         .get("/api/user/getSignin",
             {
                 params: {
-                    id: store.state.userInfo.no,
+                    id: store.state.userInfo.username,
                 }
             })
         .then(res => {
@@ -132,7 +132,7 @@ const clickSign = (item) => {
     axios.get('/api/user/getSignStudent', {
         params: {
             tableName: item.tableName,
-            id: store.state.userInfo.no
+            id: store.state.userInfo.username
         }
     }).then(res => {
         if (res.data.length > 0) {

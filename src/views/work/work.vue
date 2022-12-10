@@ -47,7 +47,7 @@ onMounted(() => {
         .get("/api/user/getWorkin",
             {
                 params: {
-                    id: store.state.userInfo.no,
+                    id: store.state.userInfo.username,
                 }
             })
         .then(res => {
@@ -93,7 +93,7 @@ const clickWork = (item) => {
     axios.get('/api/user/getWorkStudent', {
         params: {
             name: item.tableName,
-            id: store.state.userInfo.no
+            id: store.state.userInfo.username
         }
     }).then(res => {
         if (res.data.length > 0) {

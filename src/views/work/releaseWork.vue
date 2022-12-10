@@ -57,7 +57,7 @@ onMounted(() => {
     axios
         .get('/api/user/getWork',{
             params:{
-                id:store.state.userInfo.no
+                id: store.state.userInfo.username
             }
         })
         .then(res=>{
@@ -140,7 +140,7 @@ const release = () => {
             alert(error);
         })
     let message = {
-        t_id: store.state.userInfo.no,
+        t_id: store.state.userInfo.username,
         title:data.title,
         startTime: data.format[0],
         endTime: data.format[1],

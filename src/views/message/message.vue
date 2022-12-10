@@ -53,7 +53,7 @@ onMounted(()=>{
         axios.get('/api/user/getCourseStudent',{
             params:{
                 role:'teacher',
-                id: store.state.userInfo.no
+                id: store.state.userInfo.username
             }
         }).then(res => {
             if (res.data.length > 0) {

@@ -70,7 +70,7 @@ onMounted(() => {
     axios
         .get("/api/user/getSign", {
             params: {
-                id: store.state.userInfo.no
+                id: store.state.userInfo.username
             }
         })
         .then(res => {
@@ -157,7 +157,7 @@ const releaseSign = () => {
         })
     let message = {
         type: radio.value,
-        t_id: store.state.userInfo.no,
+        t_id: store.state.userInfo.username,
         startTime: data.format[0],
         endTime: data.format[1],
         number: data.pass,

@@ -53,7 +53,7 @@ const handleAvatarSuccess = (res, file) => {
         data.photo = url;
         if (store.state.userInfo.role == 'student') {
             axios.post('/api/user/editStudents', {
-                s_id: store.state.userInfo.no,
+                s_id: store.state.userInfo.username,
                 photo: data.photo
 
             }).then(res => {
@@ -65,7 +65,7 @@ const handleAvatarSuccess = (res, file) => {
         }
         else{
             axios.post('/api/user/editTeachers', {
-                t_id: store.state.userInfo.no,
+                t_id: store.state.userInfo.username,
                 photo: data.photo
 
             }).then(res => {

@@ -72,7 +72,7 @@ onMounted(() => {
     axios
         .get('/api/user/getScore', {
             params: {
-                t_id:store.state.userInfo.no,
+                t_id: store.state.userInfo.username,
             }
         })
         .then(res=>{

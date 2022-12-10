@@ -142,7 +142,7 @@ const querySearch = (queryString, cb) => {
 }
 const createFilter = (queryString) => {
     return (restaurant) => {
-        var result = restaurant.name || restaurant.s_name || restaurant.course_name || restaurant.no
+        var result = restaurant.name || restaurant.s_name || restaurant.course_name || restaurant.username
         return (
             result.toLowerCase().indexOf(queryString.toLowerCase()) >= 0
         )
