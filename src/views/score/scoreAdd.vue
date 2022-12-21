@@ -29,7 +29,7 @@
             <el-table-column prop="s_name" label="学生" width="180">
 
             </el-table-column>
-            <el-table-column prop="score" label="成绩">
+            <el-table-column prop="score" label="成绩" >
                 <template #default="scope">
                     <span v-show="!data.editScore">{{ scope.row.score }}</span>
                     <el-input v-show="data.editScore" v-model="scope.row.score"
@@ -58,7 +58,7 @@ const data = reactive({
 onMounted(() => {
     axios.get('/api/user/getScore', {
         params: {
-            t_id: store.state.userInfo.no
+            t_id: store.state.userInfo.username
         }
     }).then(res => {
         if (res.data.length > 0) {
@@ -88,12 +88,30 @@ const inputFile = async (e) => {
     let file = e.raw
     if (!file) return
     // 读取file文件的内容(转换为json格式)
-    let data = await readFile(file)
+    let result = await readFile(file)
     // type :'binary' 类型为二进制
-    let eleData = XLSX.read(data, { type: "binary" })
+    let eleData = XLSX.read(result, { type: "binary" })
     let eleDataSheet = eleData.Sheets[eleData.SheetNames[0]]
     eleData = XLSX.utils.sheet_to_json(eleDataSheet) // 将解析出的数据转换为json格式（xlsx自带的方法）
-    data.msg = eleData;
+    const keyObj = {
+        课程id: "c_id",
+        课程: "course_name",
+        学生: "s_name",
+        成绩: "score",
+    };
+
+    eleData.forEach((item) => {
+        // 将中文的键名替换成英文的
+        for (let k in keyObj) {
+            let newKey = keyObj[k];
+            if (newKey) {
+                item[newKey] = item[k];
+                delete item[k];
+            }
+        }
+    });
+    data.msg = eleData
+    alert('导入成功')
 }
 const cellClick = (row, column, cell, event) => {
 

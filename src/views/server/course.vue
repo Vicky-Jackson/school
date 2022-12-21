@@ -12,7 +12,7 @@ const data = reactive({
     keys: [],
     add: '',
     edit: '',
-    table: 'score'
+    table: 'course'
 })
 onMounted(() => {
     data.remove = '/api/user/removeCourse'

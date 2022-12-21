@@ -31,9 +31,12 @@
                 <el-menu-item v-for="o in message" :key="o" :index="o.path">
                     {{ o.meta.title }}
                 </el-menu-item>
+                <el-menu-item index="/number">
+                    新生数据
+                </el-menu-item>
             </el-sub-menu>
-            <el-menu-item index="/number">
-                新生数据
+            <el-menu-item index="/course" v-if="store.state.userInfo.role === 'student'" >
+                选课
             </el-menu-item>
             <div id="avatar">
                 <el-dropdown>
@@ -100,6 +103,7 @@ const myMessage = () => {
 const clickQuit = () => {
     store.commit('setUserInfo', {});
     store.commit('setMessage', {});
+    store.commit('constRoutes', []);
     router.push('/login')
 }
 const goback = ()=>{
@@ -112,10 +116,6 @@ const goback = ()=>{
 
 }
 
-const clickBack= ()=>{
-    window.location.href ="http://10.3.81.111:3000/"
-    
-}
 </script>
 
 <style lang="less" scoped>

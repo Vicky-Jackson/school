@@ -1,9 +1,9 @@
 <template>
     <div id="sign_detail">
-        <div v-if="data.empty === true">
+        <div v-if="msg.length === 0">
             <em>还无人签到</em>
         </div>
-        <div v-else >
+        <div >
         <el-space wrap>
             <el-card v-for="item in msg" :key="item" class="box-card" @click="clickCard(item)">
                 <span>{{item.s_name}}</span>

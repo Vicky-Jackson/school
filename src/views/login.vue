@@ -38,7 +38,8 @@ const data = reactive({
     loginData: {
         username: '',
         password: '',
-    }
+    },
+    tableData: []
 })
 const router = useRouter();
 
@@ -52,16 +53,40 @@ onMounted(() => {
         progressNum = progressNum.toFixed(2) * 100;
         data.progress = progressNum;
     })
+    axios.get('/api/user/getVisited').then(res => {
+        console.log(res);
+        if (res.data.length > 0) {
+            store.commit('setVisited', res.data)
+            localStorage.setItem('visited', res.data);
+            let params = new Date();
+            let params1 = new Date(params.setDate(params.getDate() - 1));
+            let isTrue = false;
+            params1 = params1.getFullYear() + "-" + (params1.getMonth() + 1) + "-" + (params1.getDate());
+            params = params.getFullYear() + "-" + (params.getMonth() + 1) + "-" + params.getDate();
+            res.data.filter(item => {
+                if (item.time.substr(0, 10) === params1) {
+                    isTrue = true;
+                    axios.get('/api/user/updateVisited').then(res1 => {
+                        console.log(res1);
+                    })
+                }
+            })
+            if (isTrue == false) {
+                axios.get('/api/user/addVisited').then(res2 => {
+                    console.log(res2);
+                })
+            }
+        }
+    })
 })
 const query = () => {
     axios
-        .post("/api/user/getUser",data.loginData)
+        .post("/api/user/getUser", data.loginData)
         .then((res) => {
             console.log(res);
             if (res.data.length > 0) {
                 store.commit('setUserInfo', res.data[0])
                 sessionStorage.setItem('loginData', JSON.stringify(res.data[0]))
-                //跳转到  /index  页面
                 axios
                     .get('/api/user/getMessage', {
                         params: {
@@ -75,10 +100,16 @@ const query = () => {
                             console.log(res.data);
                         }
                     })
-                  router.push({
-                    path: '/'
-                })  
-                
+                if (res.data[0].role === 'admin') {
+                    router.push('/serverhome')
+                }
+                else {
+                    router.push({
+                        path: '/'
+                    })
+                }
+
+
             }
             else {
                 alert("用户名或密码错误！");
@@ -87,7 +118,7 @@ const query = () => {
         .catch((error) => {
             alert(error);
         });
-    
+
 }
 </script>
 

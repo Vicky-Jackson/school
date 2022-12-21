@@ -78,8 +78,8 @@ class Home3d {
         // this.scene.setEnvMap('000');
         //this.scene.background = new THREE.Color("#D2B48C");
         this.scene.add(new THREE.AmbientLight(0x999999));
-        this.scene.rotation.set(0, -Math.PI / 4, 0);
-        this.scene.position.set(10, -80, -40)
+        // this.scene.rotation.set(0, -Math.PI / 4, 0);
+        // this.scene.position.set(10, -80, -40)
 
     }
     initCamera() {
@@ -89,7 +89,8 @@ class Home3d {
             0.1,
             1000
         );
-        this.camera.position.set(0, 80, 100);
+        this.camera.position.set(0, 0, 0.1);
+       
     }
     initRenderer() {
         this.renderer = new THREE.WebGLRenderer({
@@ -114,7 +115,7 @@ class Home3d {
             this.moveOnCurve();
         }
         else{
-            this.camera.position.set(0, 80, 100);
+            // this.camera.position.set(0, 0, 100);
         }   
         this.renderer.render(this.scene, this.camera);
     }
@@ -167,8 +168,8 @@ class Home3d {
 
             console.log(gltf.scene);
             var mesh = this.initSprite("教学楼");
-            mesh.position.set(90, 60, -310);
-            mesh.scale.set(30, 30, 1);
+            mesh.position.set(80, 20, -310);
+            mesh.scale.set(20, 20, 1);
             console.log(mesh)
             mesh.name = "teach";
             model.add(mesh);

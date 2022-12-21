@@ -1,8 +1,12 @@
 <template>
     <div class="nav">
+        <div id="input">
+            <el-input v-model="data.input" placeholder="请输入姓名" clearable  @input="handleSelect" :suffix-icon="Search"></el-input>
+        </div>
         <el-space wrap>
-        <el-card v-for="(teacher, o) in data.message" :key="o" @click="clickCard(teacher)">
-            <img class='image' src="https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png">
+        <el-card v-for="(teacher, o) in data.input === '' ? data.message : data.results" :key="o" @click="clickCard(teacher)">
+            <el-image style="width: 120px; height: 120px"
+                :src="teacher.t_photo ? teacher.t_photo : 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'" />
             <div id="message">
                 <div>
                     <span>姓名：{{ teacher.name }}</span>
@@ -15,19 +19,17 @@
         </el-space>
         <el-dialog v-model="data.dialogForm">
             <div>
-                <span v-if="data.click.class">班级：{{ data.click.class }}</span>
-                <span v-else>电话：{{ data.click.phone }}</span>
+                <span v-if="data.click.phone || data.click.t_phone">电话：{{ data.click.phone || data.click.t_phone }}</span>
             </div>
             <div>
                 <span v-if="data.click.course_name">课程：{{ data.click.course_name }}</span>
-                <span v-else>邮箱：{{ data.click.email }}</span>
+                
             </div>
             <div>
-                <span v-if="data.click.t_phone">电话：{{ data.click.t_phone }}</span>
-                <span v-else>住址：{{ data.click.address }}</span>
+                <span v-if="data.click.email || data.click.t_email">邮箱：{{ data.click.email || data.click.t_email }}</span>
             </div>
             <div>
-                <span v-if="data.click.t_email">邮箱：{{ data.click.t_email }}</span>
+                <span v-if="data.click.address">住址：{{ data.click.address }}</span>
             </div>
         </el-dialog>
     </div>
@@ -37,17 +39,22 @@
 import axios from 'axios'
 import { reactive, onMounted } from 'vue';
 import store from '../../store';
-
+import { Search } from '@element-plus/icons-vue';
 const data = reactive({
     message: [],
     click:{},
-    dialogForm:false
+    dialogForm:false,
+    photo:[],
+    input:"",
+    results:[]
 })
 onMounted(()=>{
     if (store.state.userInfo.role == 'admin') {
         axios.get('/api/user/getTeachers', {}).then(res => {
             if (res.data.length > 0) {
-                data.message = res.data;
+                res.data.filter(item=>{
+                    data.message.push(item);
+                })
             }
         })
     }
@@ -59,7 +66,9 @@ onMounted(()=>{
             }
         }).then(res => {
             if (res.data.length > 0) {
-                data.message = res.data;
+                res.data.filter(item => {
+                    data.message.push(item);
+                })
             }
         })
     }
@@ -67,6 +76,12 @@ onMounted(()=>{
 const clickCard = (item) => { 
     data.click = item
     data.dialogForm = true;
+}
+
+const handleSelect = () => {
+    data.results = data.message.filter(item => {
+        return item.name.includes(data.input);
+    })
 }
 </script>
 
@@ -102,5 +117,11 @@ const clickCard = (item) => {
     div {
         padding: 5px;
     }
+}
+#input{
+    width: 200px;
+    margin-bottom: 10px;
+    position: relative;
+    left:80%;
 }
 </style>

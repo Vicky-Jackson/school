@@ -29,12 +29,17 @@ onMounted(()=>{
             convertor.translate(pointArr, 1, 5, function (resPoint) {
                 if (resPoint && resPoint.points && resPoint.points.length > 0) {
                     lng = resPoint.points[0].lng;
-                    lat = resPoint.points[0].lat-0.01;
+                    lat = resPoint.points[0].lat-0.0113;
                 }
                 const point = new BMap.Point(lng, lat);
                 const geo = new BMap.Geocoder();
                 geo.getLocation(point, (res) => {
-                    emit('on-address',res);
+                    console.log(res);
+                    const newPoint = res.point;
+                    map.centerAndZoom(newPoint, 15);
+                    var marker = new BMap.Marker(newPoint);        // 创建标注   
+                    map.addOverlay(marker);      
+                    emit('on-address', res.surroundingPois[0].title);
                 });
             })
         }, 1000);

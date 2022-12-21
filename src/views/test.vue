@@ -1,193 +1,137 @@
 <template>
-  <div id="hello">
-    <h2 style="margin:0;text-align:center;">测试表</h2>
-    <!-- 表格 -->
-    <el-table :data="testDatas" border style="width: 100%;margin-top:10px"
-      :row-class-name="tableRowClassName">
-      <el-table-column v-if="columnList.length > 0" type="index" label="编号" :width="50" />
-      <el-table-column v-for="(col, idx) in columnList" :key="col.prop" :index="idx">
-        <!-- 自定义表头的内容 -->
-        <template #header>
-          <p v-show="col.show" @dblclick="col.show = false">
-            {{ col.label }}
-            <i class="el-icon-edit-outline" @click="col.show = false"></i>
-          </p>
-          <el-input size="mini" v-show="!col.show" v-model="col.label" @blur="col.show = true">
-          </el-input>
-        </template>
-        <!-- 自定义列的内容-->
-        <template #default="scope">
-          <p v-show="scope.row[col.prop].show" @dblclick="scope.row[col.prop].show = false">
-            {{ scope.row[col.prop].content }}
-            <i class="el-icon-edit-outline" @click="scope.row[col.prop].show = false"></i>
-          </p>
-          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-show="!scope.row[col.prop].show"
-            v-model="scope.row[col.prop].content" @blur="scope.row[col.prop].show = true">
-          </el-input>
-        </template>
-      </el-table-column>
-    </el-table>
-    <p style="text-align:left;color:#ccc;">右键菜单，双击编辑</p>
-
-    <div>
-      <h3 style="text-align:center;">实时数据展示</h3>
-      <label>当前目标：</label>
-      <p>{{ JSON.stringify(curTarget) }}</p>
-      <label>表头：</label>
-      <p v-for="col in columnList" :key="col.prop">{{ JSON.stringify(col) }}</p>
-      <label>数据：</label>
-      <ul>
-        <li v-for="(data, idx) in testDatas" :key="idx">
-          <p v-for="(key, idx1) in Object.keys(data)" :key="idx1">{{ key + ': ' + JSON.stringify(data[key]) }}</p>
-        </li>
-      </ul>
-    </div>
-
-    <!-- 表头右键菜单 -->
-    <div v-show="showMenu" id="contextmenu">
-      <i class="el-icon-circle-close hideContextMenu" @click="showMenu = false"></i>
-      <el-button size="mini" type="primary" @click="addColumn()">前方插入一列</el-button>
-      <el-button size="mini" type="primary" @click="addColumn(true)">后方插入一列</el-button>
-      <el-popconfirm title="确定删除该列吗？" @confirm="delColumn">
-        <template #reference>
-          <el-button type="primary" size="mini">删除当前列</el-button>
-        </template>
-      </el-popconfirm>
-      <div v-show="!curTarget.isHead">
-        <hr />
-        <el-button size="mini" type="primary" @click="addRow()">上方插入一行</el-button>
-        <el-button size="mini" type="primary" @click="addRow(true)">下方插入一行</el-button>
-        <el-popconfirm title="确定删除该行吗？" @confirm="delRow">
+  <div id="course">
+    <div id="card" v-for="(item) in data.courses" :key="item">
+      <el-card>
+        <span>{{ item.course_name }}-{{ item.time }}</span>
+        <el-popconfirm title="确定选择这门课吗？选课后不可更改！" @confirm="handleComfirm(item)">
           <template #reference>
-            <el-button type="primary" size="mini">删除当前行</el-button>
+            <el-button type="danger">选课</el-button>
           </template>
         </el-popconfirm>
-      </div>
+        
+      </el-card>
     </div>
-
+    <div @click="drawer = true" id="right">
+      <span v-if="drawer === false">已有课程信息</span>
+      <el-icon :size="18">
+        <Back />
+      </el-icon>
+    </div>
+    
+    <el-drawer v-model="drawer" title="已有课程信息">
+      <el-table id="exportTab" :data="data.msg" stripe style="width: 100%" height="450">
+        <el-table-column prop="course_name" label="课程名称"></el-table-column>
+        <el-table-column prop="time" label="上课时间"></el-table-column>
+        <el-table-column prop="type" label="类型"></el-table-column>
+      </el-table>
+    </el-drawer>
   </div>
+
 </template>
 
-<script>
-export default {
-  name: 'demo',
-  data() {
-    return {
-      columnList: [
-        { prop: "name", label: '姓名', show: true },
-        { prop: "age", label: '年龄', show: true },
-        { prop: "city", label: '城市', show: true },
-        { prop: "tel", label: '电话', show: true }
-      ],
-      testDatas: [{
-        name: { content: '张三', show: true },
-        age: { content: 24, show: true },
-        city: { content: '广州', show: true },
-        tel: { content: '13312345678', show: true }
-      }, {
-        name: { content: '李四', show: true },
-        age: { content: 25, show: true },
-        city: { content: '九江', show: true },
-        tel: { content: '18899998888', show: true }
-      }],
-      count_col: 0,
-      showMenu: false,
-      curTarget: {                 // 当前目标信息
-        rowIdx: null,              // 行下标
-        colIdx: null,              // 列下标
-        isHead: undefined          // 当前目标是表头？
-      },
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { Back } from '@element-plus/icons-vue';
+import axios from 'axios';
+import store from '../store';
+// import { ElMessage } from 'element-plus';
+const drawer = ref(false)
+const clickDrawer = ref(false)
+const data = reactive({
+  msg: [],
+  courses:[],
+  message:[],
+})
+onMounted(() => {
+
+  axios.get('/api/user/getCourseStudent', {
+    params: {
+      role: store.state.userInfo.role,
+      id: store.state.userInfo.username
     }
-  },
-  methods: {
-    rightClick(row, column, event) {
-      // 阻止浏览器自带的右键菜单弹出
-      event.preventDefault() // window.event.returnValue = false
-      if (column.index == null) return
-      // 定位菜单
-      let ele = document.getElementById('contextmenu')
-      ele.style.top = event.clientY - 25 + 'px'
-      ele.style.left = event.clientX - 25 + 'px'
-      if (window.innerWidth - 140 < event.clientX) {
-        ele.style.left = 'unset'
-        ele.style.right = 0
-      }
-      this.showMenu = true
-      // 当前目标
-      this.curTarget = {
-        rowIdx: row ? row.row_index : null,
-        colIdx: column.index,
-        isHead: !row
-      }
-    },
-    // 新增行
-    addRow(later) {
-      this.showMenu = false
-      if (this.curTarget.rowIdx === null) return
-      const idx = later ? this.curTarget.rowIdx + 1 : this.curTarget.rowIdx
-      let obj = {}
-      this.columnList.forEach(p => {
-        obj[p.prop] = { content: '', show: true }
+  }).then(res => {
+    if (res.data.length > 0) {
+      res.data.filter(item=>{
+        let time = item.time.split('');
+        item.time = "周"+time[0]+"("+time[1]+")"
+        data.msg.push({
+          course_name:item.course_name,
+          time:item.time,
+          type:item.type
+        });
       })
-      this.testDatas.splice(idx, 0, obj)
-    },
-    // 删除行
-    delRow() {
-      this.showMenu = false
-      this.curTarget.rowIdx !== null && this.testDatas.splice(this.curTarget.rowIdx, 1)
-    },
-    // 新增列
-    addColumn(later) {
-      this.showMenu = false
-      const idx = later ? this.curTarget.colIdx + 1 : this.curTarget.colIdx
-      let obj = { prop: 'col_' + ++this.count_col, label: '', show: true }
-      this.columnList.splice(idx, 0, obj)
-      this.testDatas.forEach(p => {
-        // vue3无需 this.$set(p, obj.col, { content: '', show: true }) // vue2中, 新增的对象无法被监听到
-        p[obj.prop] = { content: '', show: true }
+    }
+  })
+
+  axios.get('/api/user/getCourse', {
+    params: {
+      system: store.state.message.system,
+      id: store.state.userInfo.username
+    }
+  }).then(res => {
+    if (res.data.length > 0) {
+      res.data.filter(item => {
+        let time = item.time.split('');
+        item.time = "周" + time[0] + "(" + time[1] + ")"
+         data.courses.push(item);
       })
-    },
-    // 删除列
-    delColumn() {
-      this.showMenu = false
-      let colKey = this.columnList[this.curTarget.colIdx].prop
-      this.columnList.splice(this.curTarget.colIdx, 1)
-      this.testDatas.forEach(p => delete p[colKey])
-    },
-    // 添加表格行下标
-    tableRowClassName({ row, rowIndex }) {
-      row.row_index = rowIndex
-    },
+    }
+  })
+})
+const handleComfirm = (item)=>{
+  var really = false;
+  data.msg.filter(index=>{
+    if(index.time === item.time){
+      really = true;
+      ElMessage.error("与已有课程时间撞上！")
+    }
+  })
+  if(really === false){
+    axios.post('/api/user/addScore',{
+      s_id:store.state.userInfo.username,
+      c_id:item.c_id
+    }).then(res=>{
+      if(res.status === 200){
+        data.msg.push({
+          course_name: item.course_name,
+          time: item.time,
+          type: item.type
+        });
+        data.courses.map((item1,index)=>{
+          if(item.course_name === item1.course_name){
+            data.courses.splice(index,1);
+          }
+        })
+        ElMessage.success("选择成功！")
+      }
+    })
   }
 }
 </script>
-  
+
+
 <style lang="less" scoped>
-#hello {
-  position: relative;
+#course {
+  width: 100%;
+  min-height: 100vh;
+  background-color: black;
 }
+#card{
+  padding:10px;
 
-#contextmenu {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: auto;
-  width: 120px;
-  border-radius: 3px;
-  border: 1px solid #999999;
-  background-color: #f4f4f4;
-  padding: 10px;
-  z-index: 12;
-
-  button {
-    display: block;
-    margin: 0 0 5px;
+  .el-button{
+    position: relative;
+    left:85%
   }
 }
-
-.hideContextMenu {
-  position: absolute;
-  top: 5px;
-  right: 5px;
+#right {
+  color: white;
+  width: 20px;
+  height: 150px;
+  background-color: blue;
+  cursor: pointer;
+  position: fixed;
+  top: 200px;
+  left: 98.5%
 }
 </style>

@@ -115,7 +115,7 @@ const clickCard = (item) => {
     axios
         .get('/api/user/getSignStudent', {
             params: {
-                name: item.tableName
+                tableName: item.tableName
             }
         })
         .then(res => {

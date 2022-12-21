@@ -100,7 +100,7 @@ editorConfig.MENU_CONF['uploadImage'] = {
         let href = imgInfo.imgPath
         if (!url) throw new Error(`Image url is empty`)
         console.log('Your image url ', url)
-        url = 'http://10.3.81.111:5173/public/image/'+ url;
+        url = 'http://localhost:5173/public/image/'+ url;
         console.log(url);
         insertFn(url,href)
     },

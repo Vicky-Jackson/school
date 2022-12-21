@@ -1,66 +1,67 @@
 <template>
-    <div id="sign"> 
+    <div id="sign">
         <div id="card" v-for="o in data.msg" :key="o">
-        <el-card id="card-item" @click="clickSign(o)">
-            <span>{{ o.type }}-{{ o.t_id }}</span>
-            <div id="time">
-                <span id="time-child">{{ o.startTime }}-{{ o.endTime }}</span>
-            </div>
-        </el-card>
+            <el-card id="card-item" @click="clickSign(o)">
+                <span>{{ o.type }}-{{ o.t_id }}</span>
+                <div id="time">
+                    <span id="time-child">{{ o.startTime }}-{{ o.endTime }}</span>
+                </div>
+            </el-card>
+        </div>
+        <el-dialog v-model="data.dialog[0]" title="签到">
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="data.dialog[0] = false">Cancel</el-button>
+                    <el-button type="primary" @click="releaseSign">
+                        Confirm
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="data.dialog[1]" title="位置签到">
+            <common-map @on-address="getAddress" style="width:600px;height:400px"></common-map>
+            <p>正在定位：{{data.address}}</p>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="data.dialog[1] = false">Cancel</el-button>
+                    <el-button type="primary" @click="releaseSign">
+                        签到
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="data.dialog[2]" title="照相签到">
+            <photo @on-photo="getPhoto"></photo>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="data.dialog[2] = false">Cancel</el-button>
+                    <el-button type="primary" @click="releaseSign">
+                        Confirm
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="data.dialog[3]" title="验证码签到">
+            <el-form label-width="100px" class="demo-ruleForm" :model="data">
+                <el-form-item label="请输入验证码">
+                    <el-input v-model="data.pass"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="data.dialog[3] = false">Cancel</el-button>
+                    <el-button type="primary" @click="releaseSign">
+                        Confirm
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
     </div>
-    <el-dialog v-model="data.dialog[0]" title="签到">
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="data.dialog[0] = false">Cancel</el-button>
-                <el-button type="primary" @click="releaseSign">
-                    Confirm
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
 
-    <el-dialog v-model="data.dialog[1]" title="位置签到">
-        <common-map @on-address="getAddress" style="width:600px;height:400px"></common-map>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="data.dialog[1] = false">Cancel</el-button>
-                <el-button type="primary" @click="releaseSign">
-                    签到
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
-
-    <el-dialog v-model="data.dialog[2]" title="照相签到">
-        <photo @on-photo="getPhoto"></photo>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="data.dialog[2] = false">Cancel</el-button>
-                <el-button type="primary" @click="releaseSign">
-                    Confirm
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
-
-    <el-dialog v-model="data.dialog[3]" title="验证码签到">
-        <el-form label-width="100px" class="demo-ruleForm" :model="data">
-            <el-form-item label="请输入验证码">
-                <el-input v-model="data.pass"></el-input>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="data.dialog[3] = false">Cancel</el-button>
-                <el-button type="primary" @click="releaseSign">
-                    Confirm
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
-
-    </div>
-    
 </template>
 
 <script setup>
@@ -70,7 +71,8 @@ import { onMounted, ref, reactive } from "vue";
 import Photo from '../../components/photo.vue'
 import commonMap from '../../components/map.vue'
 import store from '../../store/index'
-import { ElMessage } from 'element-plus'
+
+// import { ElMessage } from 'element-plus'
 
 const data = reactive({
     address: '',
@@ -79,7 +81,8 @@ const data = reactive({
     pass: '',
     image: '',
     click: {},
-    dialog: [false, false, false, false, false]
+    dialog: [false, false, false, false, false],
+    isTrue:false
 })
 
 onMounted(() => {
@@ -136,46 +139,60 @@ const clickSign = (item) => {
         }
     }).then(res => {
         if (res.data.length > 0) {
-            data.dialog[4] = true
-            ElMessage({
-                message: 'Congrats, this is a success message.',
-                type: 'success',
-            })
+            data.isTrue = true
+            ElMessage.success('签过到了!');
+        }
+        else{
+            if (item.type == '普通签到') {
+                data.dialog[0] = true
+            }
+            else if (item.type == '位置签到') {
+                data.dialog[1] = true
+            }
+            else if (item.type == '照相签到') {
+                data.dialog[2] = true
+            }
+            else if (item.type == '验证码签到') {
+                data.dialog[3] = true
+            }
         }
     })
-
-    if (item.type == '普通签到') {
-        data.dialog[0] = true
-    }
-    else if (item.type == '位置签到') {
-        data.dialog[1] = true
-    }
-    else if (item.type == '照相签到') {
-        data.dialog[2] = true
-    }
-    else if (item.type == '验证码签到') {
-        data.dialog[3] = true
-    }
-
+        
 }
 
 const getAddress = (res) => {
-    data.address = res.address;
+    console.log(res);
+    data.address = res;
 }
 
 const getPhoto = (image) => {
     data.image = image;
 }
 const releaseSign = () => {
-    if(data.dialog[3] === true){
-        if(data.pass !== data.click.number){
+    if(data.isTrue === true){
+        alert('已签过到');
+        data.dialog = data.dialog.filter(item => item = false);
+        data.isTrue = false;
+        return ;
+    }
+    if (data.dialog[3] === true) {
+        if (data.pass !== data.click.number) {
             alert('验证码错误');
             return;
         }
     }
+    if(data.dialog[1] === true && data.address === "") {
+        alert("正在定位中...")
+        return;
+    }
+    if (data.dialog[1] === true && data.image === ""){
+        ElMessage.error("请先进行拍照！");
+        return ;
+    }
     data.dialog = data.dialog.filter(item => item = false);
+
     const time = new Date();
-    const endTime = new Date(data.msg.endTime)
+    const endTime = new Date(data.click.endTime)
     if (time > endTime) {
         alert('不在有效时间！');
         return;
@@ -183,7 +200,7 @@ const releaseSign = () => {
     const message = {
         tableName: data.click.tableName,
         s_id: data.click.s_id,
-        s_name:store.state.message.name,
+        s_name: store.state.message.name,
         time: getTime(new Date()),
         address: data.address,
         photo: data.image
@@ -192,9 +209,12 @@ const releaseSign = () => {
         .post("/api/user/addSignin", message)
         .then(res => {
             if (res.status === 200) {
-                alert('签到成功')
-                data.address=''
-                data.image=''
+                if(data.address)
+                    alert('签到成功'+data.address)
+                else
+                    alert('签到成功')
+                data.address = ''
+                data.image = ''
             }
         })
 
@@ -218,15 +238,18 @@ const releaseSign = () => {
         border: 2px solid rgb(132, 132, 132);
     }
 }
+
 #time {
     float: right;
+
     #time-child {
         font-size: 12px;
         color: #999;
     }
 }
-#sign{
-    width:100%;
+
+#sign {
+    width: 100%;
     min-height: 100vh;
     background-color: black;
 }

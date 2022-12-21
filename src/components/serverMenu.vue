@@ -1,29 +1,32 @@
 <template>
     <div id="header">
         <el-button type="primary" @click="dialogFormVisible = true">添加</el-button>
-        <el-button type="primary">保存数据</el-button>
         <el-button type="success" @click="exportExcel">导出</el-button>
+        <el-button type="danger" @click="handleRemove" style="margin-right:10px">全部删除</el-button>
+        <el-cascader v-model="data.value" placeholder="专业查询" :options="data.options" :props="props"
+            @change="handleChange" v-if="tableData.table !== 'users' && tableData.table !== 'teacher'" @focus="handleFocus" filterable clearable/>
         <div id="inputAuto">
             <el-autocomplete v-model="data.state" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable
-                class="inline-input" placeholder="Please Input" @select="handleSelect" :suffix-icon="Search"
+                class="inline-input" placeholder="inputName" @select="handleSelect" :suffix-icon="Search"
                 :select-when-unmatched="true">
                 <template #default="{ item }">
-                    <div class="value">{{ item.name || item.s_name || item.course_name || item.no}}</div>
+                    <div class="value">{{ item.name || item.s_name || item.course_name || item.username }}</div>
                 </template>
             </el-autocomplete>
         </div>
 
     </div>
 
-    <el-table id="exportTab" :data="data.state == '' ? tableData.message : data.message" stripe style="width: 100%"
+    <el-table id="exportTab" :data="data.state == '' ? data.value ? data.message :tableData.message :data.message " stripe style="width: 100%"
         height="450">
         <el-table-column type="selection" width="55" />
-        <el-table-column v-for="(o) in data.keys" :key="o" :prop="o" :label=o :sortable ="o ==='class' || o==='score'">
+        <el-table-column v-for="(o) in data.keys" :key="o" :prop="o" :label="o" :sortable="o === 'score'">
             <template #default="scope">
-                <span v-if="o !=='photo'">{{scope.row[o]}}</span>
-                <img :src=scope.row[o] v-else>
+                <span v-if="o !== 'photo'">{{ scope.row[o] }}</span>
+                <img :src=scope.row[o] style="width: 100px;height:100px" v-else>
             </template>
         </el-table-column>
+
         <el-table-column fixed="right" label="Operations" width="120">
             <template #default="scope">
                 <el-button link type="primary" size="small" @click="show(scope.$index, scope.row)">
@@ -59,7 +62,8 @@
         <el-form :model="data">
             <div v-for="item in data.keys" :key="item">
                 <el-form-item :label="item" :label-width="formLabelWidth" v-if="item !== 'photo'">
-                    <el-input v-model="data.click[item]" autocomplete="off" :disabled="item.split('_')[1] === 'id' || item.split('_')[0]==='id'"/>
+                    <el-input v-model="data.click[item]" autocomplete="off"
+                        :disabled="item.split('_')[1] === 'id' || item.split('_')[0] === 'id'|| item === 'username'" />
                 </el-form-item>
             </div>
         </el-form>
@@ -100,28 +104,102 @@ const data = reactive({
     state: '',
     result: {},
     keys: [],
-    click:[]
+    click: [],
+    value: null,
+    options: [],
+    colledge: [],
+    system: []
 })
 
 onMounted(() => {
     data.restaurants = tableData.message
     data.keys = tableData.keys
 })
+const handleFocus = ()=>{
+    data.restaurants.filter(item => {
+    if (data.colledge.indexOf(item.colledge) == -1) {
+        data.colledge.push(item.colledge);
+        data.system.push(item.system);
+        data.options.push({
+            value: item.colledge,
+            label: item.colledge,
+            children: [{
+                value: item.system,
+                label: item.system
+            }]
+        })
+    }
+    else {
+        if (data.system.indexOf(item.system) == -1) {
+            data.system.push(item.system);
+            data.options = data.options.filter(item1 => {
+                if (item1.value === item.colledge) {
+                    item1.children.push({
+                        value: item.system,
+                        label: item.system
+                    })
+                }
+                return item1;
+            })
+        }
+    }
+})
+}
+
+
+const props = {
+    expandTrigger: 'hover',
+}
 const deleteRow = (index, row) => {
     tableData.message.splice(index, 1)
-    axios.post(tableData.remove,row).then(res=>{
-        if(res.status === 200){
+    axios.post(tableData.remove, row).then(res => {
+        if (res.status === 200) {
             alert('删除成功')
         }
     })
 }
+
+const handleChange = (value) => {
+   if(value){
+    if(data.message.length === 0 || data.state === ''){
+        data.message = tableData.message.filter(item=>{
+            if(item.system === value[1]){
+                return item;
+            }
+        })
+    }
+    else{
+        data.message = data.message.filter(item=>{
+            if(item.system === value[1]){
+                return item;
+            }
+        })
+    }
+   }
+}
+
 const onAdditem = () => {
-    tableData.message.push(data.result)
-    dialogFormVisible.value = false;
-    axios.post(tableData.add,data.result).then(res=>{
-        if(res.status===200)
-            alert('添加成功')
+    let key = Object.keys(data.result)
+    let exist = false
+    tableData.message.filter(item => {
+        if (item[key[0]] === data.result[key[0]] && exist === false) {
+            exist = true
+            dialogFormVisible.value = false;
+            alert('id或者用户名已存在')
+        }
     })
+    if (exist === false) {
+        tableData.message.push(data.result)
+        dialogFormVisible.value = false;
+        axios.post(tableData.add, data.result).then(res => {
+            if (res.status === 200)
+                alert('添加成功')
+            else {
+                alert('信息填写错误或id已存在')
+            }
+        })
+    }
+
 }
 
 const onEdititem = () => {
@@ -149,12 +227,12 @@ const createFilter = (queryString) => {
     }
 }
 const handleSelect = (item) => {
-    data.state = item.name;
+    data.state = item.s_name;
     data.message = [item]
 }
 const show = (index, row) => {
     data.click = row
-    dialogForm.value=true
+    dialogForm.value = true
     console.log(row)
 }
 const exportExcel = () => {
@@ -173,6 +251,9 @@ const exportExcel = () => {
         }
     }
     return wbout
+}
+const handleRemove = () => {
+
 }
 </script>
 

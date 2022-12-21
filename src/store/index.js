@@ -8,7 +8,8 @@ const store = createStore({
          signStudent: sessionStorage.getItem('sign') || [],
          workStudent: sessionStorage.getItem('work') || [],
          course: sessionStorage.getItem('course') || [],
-         valueHtml:''
+         valueHtml:'',
+         visited:localStorage.getItem('visited') || []
     },
     mutations:{
         setUserInfo(state, uInfo) {
@@ -31,6 +32,9 @@ const store = createStore({
         },
         setValueHtml(state, valueHtml) {
             state.valueHtml = valueHtml
+        },
+        setVisited(state,visited){
+            state.visited = visited
         }
     },
     actions:{},

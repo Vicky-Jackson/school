@@ -10,8 +10,8 @@
             <div id="img">
                 <img :src="data.photo" />
                 <div>
-                    <el-upload limit="1" action="/api/user/upload" :show-file-list="false"
-                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                    <el-upload :action="data.url" :show-file-list="false"
+                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :data="data.fileData">
                         <el-button type="primary">上传照片</el-button>
                     </el-upload>
                 </div>
@@ -31,7 +31,11 @@ const message = store.state.message;
 const data = reactive({
     card3d: {},
     message: {},
-    photo: ''
+    photo: '',
+    url:"/api/user/upload",
+    fileData:{
+        fieldname:'file'
+    }
 })
 onMounted(() => {
     data.message = store.state.message;
@@ -45,14 +49,15 @@ onMounted(() => {
         data.photo = "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
     }
 })
+
 const handleAvatarSuccess = (res, file) => {
     console.log(res)
     if (res.data[0].isOK === true) {
         let url = res.data[0].imgName;
-        url = 'http://10.3.81.111:5173/public/image/' + url;
+        url = 'http://localhost:5173/public/image/' + url;
         data.photo = url;
         if (store.state.userInfo.role == 'student') {
-            axios.post('/api/user/editStudents', {
+            axios.post('/api/user/updateStudent', {
                 s_id: store.state.userInfo.username,
                 photo: data.photo
 
@@ -64,7 +69,7 @@ const handleAvatarSuccess = (res, file) => {
             })
         }
         else{
-            axios.post('/api/user/editTeachers', {
+            axios.post('/api/user/updateTeacher', {
                 t_id: store.state.userInfo.username,
                 photo: data.photo
 
@@ -81,8 +86,8 @@ const handleAvatarSuccess = (res, file) => {
 }
 const beforeAvatarUpload = (file) => {
     const isLt2M = file.size / 1024 / 1024 < 2;
-    let index = file.name.lastIndexOf(".");
-    let extension = file.name.substr(index + 1);
+    let index = file.name.split('.');
+    let extension = index[1];
     let extensionList = [
         "png",
         "PNG",
@@ -93,13 +98,14 @@ const beforeAvatarUpload = (file) => {
         "bmp",
         "BMP",
     ];
-    if (extensionList.indexOf(extension) < 0) {
+    if (!extensionList.includes(extension)) {
         ElMessage.error('上传头像图片格式错误!');
     }
     if (!isLt2M) {
         ElMessage.error('上传头像图片大小不能超过 2MB!');
+
     }
-    return isJPG && isLt2M;
+    return isLt2M;
 }
 </script>
 

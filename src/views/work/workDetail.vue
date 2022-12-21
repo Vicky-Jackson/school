@@ -1,9 +1,9 @@
 <template>
     <div id="sign_detail">
-        <!-- <div v-if="data.empty == true">
+        <div v-if="msg.length == 0">
             <em>还无人上交作业</em>
-        </div> -->
-        <div  id="work" style="padding:10px;">
+        </div>
+        <div  v-else id="work" style="padding:10px;">
             <el-space wrap>
                 <el-card v-for="item in msg" :key="item" class="box-card" @click="clickItem(item)">
                     <span>{{ item.s_name }}</span>
@@ -30,7 +30,7 @@ const data = reactive({
     click:{}
 })
 onMounted(() => {
-    
+
 })
 const clickItem = (item) =>{
     data.click=item;

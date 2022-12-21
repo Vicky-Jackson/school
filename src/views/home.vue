@@ -8,19 +8,26 @@
                 <h2>公告</h2>
             </div>
             <div id="line">
-                <v-charts :option="data.option_line" style="height: 250px; width:300px;"></v-charts>
+                <v-charts :option="option_line" style="height: 250px; width:300px;"></v-charts>
             </div>
         </div>
-        <vue3-seamless-scroll :list="data.listData" class="warp" hover>
-            <ul class="item">
-                <li v-for="(item, index) in data.listData" :key="index" style="cursor: pointer;" @click="handleClick(item)">
-                    <span class="title">{{ item.title }}</span>
-                    <span class="date">{{ item.time.substr(0,10) }}</span>
-                </li>
-            </ul>
-        </vue3-seamless-scroll>
+        <div>
+
+        </div>
+        <div class="warp">
+            <vue3-seamless-scroll :list="data.listData" hover>
+                <ul class="item">
+                    <li v-for="(item, index) in data.listData" :key="index" style="cursor: pointer;"
+                        @click="handleClick(item)">
+                        <span class="title">{{ item.title }}</span>
+                        <span class="date">{{ item.time.substr(0, 10) }}</span>
+                    </li>
+                </ul>
+            </vue3-seamless-scroll>
+        </div>
+
         <el-dialog v-model="dialogForm">
-            <div>{{data.click.detail}}</div>
+            <div>{{ data.click.detail }}</div>
         </el-dialog>
     </div>
 </template>
@@ -30,7 +37,7 @@ import Home3d from '../util/Home3d'
 
 import { Icon } from '@iconify/vue';
 import {
-    reactive, onMounted,ref
+    reactive, onMounted, ref
 } from 'vue'
 import { RouterLink } from "vue-router";
 import Loading from '../components/Loading.vue';
@@ -45,26 +52,32 @@ const data = reactive({
     progress: 0,
     isLoading: true,
     move: false,
-    course:[],
-    click:[],
-    option_line: {
-        title: { text: "浏览量" },
-        xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [
-            {
-                data: [150, 230, 224, 218, 135, 147, 260],
-                type: 'line'
-            }
-        ]
-    },
+    course: [],
+    click: [],
     listData: [],
+    tableData: [],
+    valueData: [],
+    keyData: []
 })
+const option_line = {
+    title: { text: "浏览量" },
+    xAxis: {
+        type: 'category',
+        data: data.keyData.reverse()
+    },
+    yAxis: {
+        type: 'value'
+    },
+    series: [
+        {
+            data: data.valueData.reverse(),
+            type: 'line'
+        }
+    ],
+    tooltip: {
+        trigger: 'axis'
+    },
+}
 function loadingFinish() {
     data.isLoading = false
 }
@@ -75,44 +88,80 @@ onMounted(() => {
         progressNum = progressNum.toFixed(2) * 100;
         data.progress = progressNum;
     })
-    axios.get('/api/user/getAnouncement').then(res=>{
-        if(res.data.length > 0){
+
+    axios.get('/api/user/getAnouncement').then(res => {
+        if (res.data.length > 0) {
             data.listData = res.data;
         }
     })
+
+    axios.get('/api/user/getVisited').then(res => {
+        if (res.data.length > 0) {
+            let j = 0;
+            for (let i = res.data.length - 1; i >= 0; i--) {
+                if (j >= 7) {
+                    break;
+                }
+                j++;
+                let date = new Date(res.data[i].time);
+                // let date1 = new Date(date.setDate(date.getDate() + 1));
+                date = date.getFullYear() + "-" + (date.getMonth() + 1) + '-' + date.getDate()
+                data.keyData.push(date);
+                data.valueData.push(res.data[i].number)
+            }
+            data.keyData = data.keyData.reverse();
+            data.valueData = data.valueData.reverse();
+        }
+    })
 })
-const handleClick = (item)=>{
-    data.click=item;
+const handleClick = (item) => {
+    data.click = item;
     dialogForm.value = true;
 }
 </script>
 
 <style lang="less" scoped>
-#container{
+#container {
     width: 100%;
-    height:100vh;
+    height: 100vh;
     background-color: black;
-   
+
 }
- #scroll {
-     position: absolute;
-     top: 70px; 
- }
-  h2 {
-      color: white
-  }
- #line{
+
+#scroll {
+    position: absolute;
+    top: 70px;
+}
+
+h2 {
+    color: rgb(0, 121, 250)
+}
+
+#line {
     position: absolute;
     top: 60px;
-    left:950px;
- }
+    left: 950px;
+    color:white;
+    // border: 3px solid blue;
+    // border-radius: 15px;
+    // background-image: linear-gradient(rgba(64, 64, 251, 0.475), rgb(44, 44, 239,
+    //             0.475), rgb(225, 225, 252,
+    //             0.475));
+}
+
 .warp {
     height: 260px;
     width: 360px;
     overflow: hidden;
-   color:white;
-    position:absolute;
-    top:110px;
+    color: white;
+    position: absolute;
+    top: 110px;
+    border: 3px solid blue;
+    border-radius: 15px;
+    background-image: linear-gradient(rgba(64, 64, 251, 0.475), rgb(44, 44, 239,
+                0.375), rgb(225, 225, 252,
+                0.375));
+
     ul {
         list-style: none;
         padding: 0;

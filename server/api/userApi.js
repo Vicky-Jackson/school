@@ -22,6 +22,51 @@ var jsonWrite = (res, ret) => {
     }
 };
 
+router.get('/getVisited', (req, res) => {
+    let sql = $sql.user.getVisited;
+    let params = new Date();
+    params = params.getFullYear()+"-"+(params.getMonth()+1)+"-"+params.getDate();
+    console.log(params);
+    conn.query(sql,(err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/updateVisited', (req, res) => {
+    let sql = $sql.user.updateVisited;
+    let params = new Date();
+    params = params.getFullYear() + "-" + (params.getMonth() + 1) + "-" + params.getDate();
+    console.log(params);
+    conn.query(sql, [params], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.get('/addVisited', (req, res) => {
+    let sql = $sql.user.addVisited;
+    let params = new Date();
+    params = params.getFullYear() + "-" + (params.getMonth() + 1) + "-" + params.getDate();
+    console.log(params);
+    conn.query(sql, [params], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
 router.post('/getUser', (req, res) => {
     let sql = $sql.user.getUser;
     let params = req.body;
@@ -108,8 +153,11 @@ router.get('/getMessage', (req, res) => {
 
 router.get('/getStudents', (req, res) => {
     let sql = $sql.user.getStudents;
-    let params = req.body;
+    let params = req.query;
     console.log(params);
+    if(params.id){
+        sql += " where s_id = '"+params.id+"'"
+    }
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -138,7 +186,7 @@ router.post('/addStudent', (req, res) => {
     let sql = $sql.user.addStudent;
     let params = req.body;
     console.log(params);
-    conn.query(sql, [params.s_id, params.s_name, params.sex, params.phone, params.email, params.address, params.class], (err, result) => {
+    conn.query(sql, [params.s_id, params.s_name, params.sex, params.phone, params.email, params.address, params.colledge,params.system], (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -152,7 +200,21 @@ router.post('/editStudent', (req, res) => {
     let sql = $sql.user.editStudent;
     let params = req.body;
     console.log(params);
-    conn.query(sql, [params.s_name, params.sex, params.phone, params.email, params.address, params.class, params.s_id], (err, result) => {
+    conn.query(sql, [params.s_name, params.sex, params.phone, params.email, params.address, params.colledge,params.system, params.s_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
+router.post('/updateStudent', (req, res) => {
+    let sql = $sql.user.updateStudent;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.photo, params.s_id], (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -218,6 +280,20 @@ router.post('/editTeacher', (req, res) => {
     });
 });
 
+router.post('/updateTeacher', (req, res) => {
+    let sql = $sql.user.updateTeacher;
+    let params = req.body;
+    console.log(params);
+    conn.query(sql, [params.photo, params.t_id], (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        if (result) {
+            jsonWrite(res, result);
+        }
+    });
+});
+
 router.post('/createSign', (req, res) => {
     let params = req.body;
     console.log(params);
@@ -265,7 +341,7 @@ router.post('/addSignin', (req, res) => {
 
 router.get('/getSignStudent', (req, res) => {
     var params = req.query;
-    var sql = ("select * from " + params.name).replace(/[\\"']/g, "");
+    var sql = ("select * from " + params.tableName).replace(/[\\"']/g, "");
     if (params.id)
         sql += ' where s_id = "' + params.id + '"';
     console.log(params);
@@ -514,7 +590,7 @@ const upload = multer({
 })
 
 router.post('/upload', upload.single('file'), (req, res) => {
-    console.log(req.file)
+    console.log(req.file);
     res.send({
         error: 0,
         data: [{
@@ -545,7 +621,12 @@ router.get('/getCourseStudent', (req, res) => {
 });
 
 router.get('/getCourse', (req, res) => {
+    var params = req.query;
     let sql = $sql.user.getCourse;
+    console.log(params);
+    if(params.id){
+        sql += " where c_id not in (select c_id from score where s_id = '"+params.id+"') and system = '"+params.system+"'"
+    }
     conn.query(sql, (err, result) => {
         if (err) {
             console.log(err);
@@ -574,7 +655,7 @@ router.post('/addCourse', (req, res) => {
     let sql = $sql.user.addCourse;
     let params = req.body;
     console.log(params);
-    conn.query(sql, [params.c_id, params.course_name, params.t_id, params.time, params.class], (err, result) => {
+    conn.query(sql, [params.c_id, params.course_name, params.t_id, params.time, params.colledge,params.system], (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -588,7 +669,7 @@ router.post('/editCourse', (req, res) => {
     let sql = $sql.user.editCourse;
     let params = req.body;
     console.log(params);
-    conn.query(sql, [params.course_name, params.t_id, params.time, params.class,params.c_id], (err, result) => {
+    conn.query(sql, [params.course_name, params.t_id, params.time, params.colledge,params.system,params.c_id], (err, result) => {
         if (err) {
             console.log(err);
         }

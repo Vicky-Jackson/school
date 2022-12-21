@@ -1,7 +1,7 @@
 <template>
     <div id="score">
         <div class="tableClass">
-            <el-table :data="data.msg" height="250" border style="width: 90%; margin-left:50px" :row-style="rowState">
+            <el-table :data="data.msg" border style="width: 90%; margin-left:50px" :row-style="rowState">
                 <el-table-column prop="c_id" label="课程id" width="180" />
                 <el-table-column prop="course_name" label="课程" width="180" />
                 <el-table-column prop="name" label="任课老师" width="180" />

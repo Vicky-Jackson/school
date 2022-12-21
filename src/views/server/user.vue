@@ -7,12 +7,13 @@
 import CommonMenu from '../../components/serverMenu.vue'
 import { reactive, onMounted } from 'vue';
 import axios from 'axios';
+import { Delete } from '@element-plus/icons-vue';
 const data = reactive({
     msg: [],
     keys: [],
     add: '',
     edit: '',
-    table: 'score'
+    table: 'users'
 })
 onMounted(() => {
     data.remove = '/api/user/removeUser'
@@ -21,6 +22,7 @@ onMounted(() => {
     axios.get('/api/user/getUserall').then(res => {
         if (res.data.length > 0) {
             res.data.filter(item => {
+                delete(item['id'])
                 data.msg.push(item)
                 if (data.keys.length == 0) {
                     Object.keys(item).forEach(key => {

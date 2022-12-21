@@ -170,10 +170,12 @@ const routes = [{
 
     },
     {
-        path: "/test",
+        path: "/course",
         name: "test",
         component: () => import("../views/test.vue"),
         meta: {
+            title:"选课",
+            role:['student'],
             header: true,
             server: false
         }
@@ -309,6 +311,7 @@ router.beforeEach((to, from, next) => {
     //判断用户是否登录
     if (!store.state.userInfo.username) {
         // 未登录，跳转到login页面
+        
         if (to.path === '/login') {
             next();
             return
@@ -338,7 +341,6 @@ router.beforeEach((to, from, next) => {
         })
         store.commit('setRoutes', constRoutes);
         sessionStorage.setItem('routes', constRoutes);
-        console.log(store.state.constRoutes)
         if ((to.meta.role && to.meta.role.includes(role)) || !to.meta.role) {
             next();
         } else {

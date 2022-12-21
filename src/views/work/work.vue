@@ -30,7 +30,7 @@ import { BaiduMap } from 'vue-baidu-map-3x'
 import { onMounted, ref, reactive } from "vue";
 import commonEditor from '../../components/editor.vue'
 import store from '../../store/index'
-import { ElMessage } from 'element-plus'
+// import { ElMessage } from 'element-plus'
 
 const data = reactive({
     address: '',
@@ -98,21 +98,18 @@ const clickWork = (item) => {
     }).then(res => {
         if (res.data.length > 0) {
             data.isTrue = true;
-            ElMessage({
-                message: 'Congrats, this is a success message.',
-                type: 'success',
-            })
+            ElMessage.success('提交过了!');
+        }
+        else{
+            data.dialog = true;
         }
     })
-    if(data.isTrue == false){
-        data.dialog = true;
-    }
 }
 const releaseWork = () => {
-   data.dialog = false;
+    data.dialog = false
    data.detail = store.state.valueHtml;
     const time = new Date();
-    const endTime = new Date(data.msg.endTime)
+    const endTime = new Date(data.click.endTime)
     if (time > endTime) {
         alert('不在有效时间！');
         return;
